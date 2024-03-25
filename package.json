@@ -1,8 +1,8 @@
 {
   "name": "kevin-tchinda",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "Kevin Tchinda",
+  "homepage": "https://kevin-tchinda.github.io",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

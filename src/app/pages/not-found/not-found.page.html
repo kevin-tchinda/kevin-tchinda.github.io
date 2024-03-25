@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>not-found</ion-title>
   </ion-toolbar>
@@ -10,4 +10,14 @@
       <ion-title size="large">not-found</ion-title>
     </ion-toolbar>
   </ion-header>
-</ion-content>
+</ion-content> -->
+
+
+<app-header></app-header>
+
+<div class="container my-margin-horizontal align-vertical">
+  <ion-text class="not-found">{{'page.not-found.404-text' | translate}}</ion-text>
+  <ion-text class="oops">{{'page.not-found.oops' | translate}}</ion-text>
+</div>
+
+<app-footer></app-footer>

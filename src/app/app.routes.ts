@@ -1,13 +1,14 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
+  // {
+  //   path: '',
+  //   redirectTo: 'my-place',
+  //   pathMatch: 'full',
+  // },
   {
     path: '',
-    redirectTo: 'my-place',
     pathMatch: 'full',
-  },
-  {
-    path: 'my-place',
     loadComponent: () => import('./pages/my-place/my-place.page').then( m => m.MyPlacePage)
   },
   {

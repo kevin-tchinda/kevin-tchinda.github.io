@@ -1,0 +1,104 @@
+div.container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+}
+
+ion-icon.cog{
+  font-size: 128px;
+}
+
+ion-icon.document-text{
+  font-size: 24px
+}
+
+ion-text{
+  font-family: 'Rubik-Mono-One-Regular';
+  text-align: center;
+}
+
+.construction-phrase{
+  font-size: 2rem;
+}
+
+.very-soon{
+  font-size: 1rem;
+}
+
+.align-vertical{
+  display: flex;
+  flex-direction: column;
+  // align-items: center;
+  gap: 1rem;
+}
+
+ion-text.resume-text{
+  font-family: 'Rubik-Regular';
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+
+a.resume{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a.resume:hover ion-text.resume-text{
+  font-family: 'Rubik-Black';
+  color: #000000;
+  transition: 0.5s color;
+}
+
+a.resume:visited ion-text.resume-text{
+  font-family: 'Rubik-Black';
+  color: #575757;
+  transition: 0.5s color;
+}
+
+@media screen and (min-width: 320px) and (max-width: 374px) {
+  .construction-phrase{
+    font-size: 1.8rem;
+  }
+}
+
+@media screen and (min-width: 375px) and (max-width: 425px) {
+  .construction-phrase{
+    font-size: 2rem;
+  }
+}
+
+@media screen and (min-width: 426px) and (max-width: 768px) {
+  .construction-phrase{
+    font-size: 2.3rem;
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .construction-phrase{
+    font-size: 4rem;
+  }
+}
+
+@media screen and (min-width: 1025px) and (max-width: 1275px) {
+  .construction-phrase{
+    font-size: 6rem;
+  }
+}
+
+@media screen and (min-width: 1276px) and (max-width: 2559px) {
+  .construction-phrase{
+    font-size: 7rem;
+  }
+}
+
+@media screen and (min-width: 2560px) {
+  .construction-phrase{
+    font-size: 10rem;
+    word-break: break-word;
+    max-width: 80%;
+  }
+}

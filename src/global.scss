@@ -24,3 +24,18 @@
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+
+
+
+/* ALL GLOBAL CSS GOES HERE */
+ion-text, ion-icon{
+  color: #252525;
+}
+
+.my-margin-horizontal{
+  margin: 0 1.5rem;
+}
+
+.my-margin-top{
+  margin-top: 1.5rem;
+}

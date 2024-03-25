@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>{{"my-place.title" | translate}}</ion-title>
   </ion-toolbar>
@@ -10,4 +10,17 @@
       <ion-title size="large">{{"my-place.title" | translate}}</ion-title>
     </ion-toolbar>
   </ion-header>
-</ion-content>
+</ion-content> -->
+
+<app-header></app-header>
+<div class="container my-margin-horizontal align-vertical">
+  <ion-icon class="cog" src="../../../assets/icon/cog.svg"></ion-icon>
+  <ion-text class="construction-phrase">{{'page.my-place.construction-phrase' | translate}}</ion-text>
+  <ion-text class="very-soon">{{'page.my-place.very-soon' | translate}}</ion-text>
+
+  <a class="resume" [href]="'page.my-place.resume-name' | translate">
+    <ion-text class="resume-text">{{'page.my-place.resume-text' | translate}}</ion-text>
+    <ion-icon class="document-text" src="../../../assets/icon/document-text.svg"></ion-icon>
+  </a>
+</div>
+<app-footer></app-footer>

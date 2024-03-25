@@ -16,9 +16,10 @@ export class TranslationService {
 
   public setDefaultLanguage(){
     let language = this.translate.getBrowserLang() || 'en';
+    console.log(language);
     if(language != 'fr'){
       this.translate.setDefaultLang('en');
-      this.storage.store(LANG_KEY, 'en');
+      // this.storage.store(LANG_KEY, 'en');
     }else{
       this.translate.setDefaultLang('fr');
       this.storage.store(LANG_KEY, 'fr');
