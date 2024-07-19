@@ -1,35 +1,341 @@
 <!DOCTYPE html>
-<html lang="en" data-critters-container>
+<html lang="en">
+  <head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:title" content="Kevin, Tchinda Ndiffo - Resume"/>
+    <meta property="og:description" content="Kevin Tchinda Ndiffo. IT analyst, with relevant experience in mobile and web development with Ionic|Angular|Django, troubleshooting system issues and enhancing business operations. Passionate about cybersecurity, machine learning and all what is related to IT"/>
+    <meta property="og:type" content="website" />
 
-<head>
-  <meta charset="utf-8">
-  <title>Kevin Tchinda</title>
+    <meta name="description" content="Kevin Tchinda Ndiffo. Ionic|Angular|Django developer with relevant experience in mobile and web development. Transitioning to cybersecurity as a security SOC analyst"/>
+    <meta name="keywords" content="Kevin, Tchinda Ndiffo, Software Developer, Cybersecurity Analyst, System Administrator, IT Analyst, kevinn_tchin, kevin-tchinda"/>
+    <meta name="author" content="Kevin, Tchinda Ndiffo" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://kevin-tchinda.github.io" />
 
-  <base href="/">
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-  <meta name="color-scheme" content="light">
-  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="format-detection" content="telephone=no">
-  <meta name="msapplication-tap-highlight" content="no">
-  <meta name="theme-color" content="#252525">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+    <!-- IONIC CSS BUNDLE -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" /> -->
 
-  <!-- Basic SEO -->
-  <meta name="description" content="Kevin Tchinda Ndiffo. Ionic|Angular|Django developer with relevant experience in mobile and web development. Transitioning to cybersecurity as a security SOC analyst">
-  <meta name="keywords" content="Kevin, Tchinda, Ndiffo, kevin-tchinda, kevinntchinda, kevinn_tchin, Developer, Security, Analyst">
-  <meta name="author" content="Kevin Tchinda">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://kevin-tchinda.github.io">
-  <!-- / Basic SEO -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-  <link rel="icon" type="image/png" href="assets/icon/Logo_64x64.png">
+    <script src="script.js" defer></script>
+    <!-- IONIC JS BUNDLE -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
 
-  <!-- add to homescreen for ios -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<style>html{--ion-default-dynamic-font:-apple-system-body;--ion-font-family:var(--ion-default-font)}body{background:var(--ion-background-color)}@supports (padding-top: 20px){html{--ion-safe-area-top:var(--ion-statusbar-padding)}}@supports (padding-top: env(safe-area-inset-top)){html{--ion-safe-area-top:env(safe-area-inset-top);--ion-safe-area-bottom:env(safe-area-inset-bottom);--ion-safe-area-left:env(safe-area-inset-left);--ion-safe-area-right:env(safe-area-inset-right)}}*{box-sizing:border-box;-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}html{width:100%;height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}html:not(.hydrated) body{display:none}body{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;margin:0;padding:0;position:fixed;width:100%;max-width:100%;height:100%;max-height:100%;transform:translateZ(0);text-rendering:optimizeLegibility;overflow:hidden;touch-action:manipulation;-webkit-user-drag:none;-ms-content-zooming:none;word-wrap:break-word;overscroll-behavior-y:none;-webkit-text-size-adjust:none;text-size-adjust:none}html{font-family:var(--ion-font-family)}@supports (-webkit-touch-callout: none){html{font:var(--ion-dynamic-font, 16px var(--ion-font-family))}}:root{--ion-color-primary:#3880ff;--ion-color-primary-rgb:56, 128, 255;--ion-color-primary-contrast:#ffffff;--ion-color-primary-contrast-rgb:255, 255, 255;--ion-color-primary-shade:#3171e0;--ion-color-primary-tint:#4c8dff;--ion-color-secondary:#3dc2ff;--ion-color-secondary-rgb:61, 194, 255;--ion-color-secondary-contrast:#ffffff;--ion-color-secondary-contrast-rgb:255, 255, 255;--ion-color-secondary-shade:#36abe0;--ion-color-secondary-tint:#50c8ff;--ion-color-tertiary:#5260ff;--ion-color-tertiary-rgb:82, 96, 255;--ion-color-tertiary-contrast:#ffffff;--ion-color-tertiary-contrast-rgb:255, 255, 255;--ion-color-tertiary-shade:#4854e0;--ion-color-tertiary-tint:#6370ff;--ion-color-success:#2dd36f;--ion-color-success-rgb:45, 211, 111;--ion-color-success-contrast:#ffffff;--ion-color-success-contrast-rgb:255, 255, 255;--ion-color-success-shade:#28ba62;--ion-color-success-tint:#42d77d;--ion-color-warning:#ffc409;--ion-color-warning-rgb:255, 196, 9;--ion-color-warning-contrast:#000000;--ion-color-warning-contrast-rgb:0, 0, 0;--ion-color-warning-shade:#e0ac08;--ion-color-warning-tint:#ffca22;--ion-color-danger:#eb445a;--ion-color-danger-rgb:235, 68, 90;--ion-color-danger-contrast:#ffffff;--ion-color-danger-contrast-rgb:255, 255, 255;--ion-color-danger-shade:#cf3c4f;--ion-color-danger-tint:#ed576b;--ion-color-dark:#222428;--ion-color-dark-rgb:34, 36, 40;--ion-color-dark-contrast:#ffffff;--ion-color-dark-contrast-rgb:255, 255, 255;--ion-color-dark-shade:#1e2023;--ion-color-dark-tint:#383a3e;--ion-color-medium:#92949c;--ion-color-medium-rgb:146, 148, 156;--ion-color-medium-contrast:#ffffff;--ion-color-medium-contrast-rgb:255, 255, 255;--ion-color-medium-shade:#808289;--ion-color-medium-tint:#9d9fa6;--ion-color-light:#f4f5f8;--ion-color-light-rgb:244, 245, 248;--ion-color-light-contrast:#000000;--ion-color-light-contrast-rgb:0, 0, 0;--ion-color-light-shade:#d7d8da;--ion-color-light-tint:#f5f6f9}html{--ion-dynamic-font:var(--ion-default-dynamic-font)}</style><link rel="stylesheet" href="styles.567658c8f7fe6dae.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles.567658c8f7fe6dae.css"></noscript></head>
+    <title>Kevin, Tchinda Ndiffo - Resume</title>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar-nav">
+        <div class="nav-logo">
+          <!-- You can put a logo here -->
+          <h1>
+            <a href="https://kevin-tchinda.github.io/"><ion-img src="./apple-touch-icon.png" style="cursor: pointer" alt="KT Logo"></ion-img></a>
+            <!-- <span>Kevin Tchinda Ndiffo</span> -->
+          </h1>
+          <!-- you can remove this -->
+        </div>
 
-<body>
-  <app-root></app-root>
-<script src="runtime.f5d4c4e9856a2471.js" type="module"></script><script src="polyfills.43d4f2a60900e049.js" type="module"></script><script src="main.d003bc7e19e2ff72.js" type="module"></script></body>
+        <button
+          class="mobile-nav-toggle"
+          aria-controls="primary-nav"
+          aria-expanded="false"
+        ></button>
 
+        <ul id="primary-nav" class="primary-nav" data-visible="false">
+          <li>
+            <a class="nav-link" href="#about">About</a>
+          </li>
+          <li>
+            <a class="nav-link" href="#portfolio">Portfolio</a>
+          </li>
+          <li>
+            <a class="nav-link" href="#contact">Contact</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section id="hero">
+        <div class="hero-container">
+          <div class="hero-text-container" data-aos="fade-up">
+            <p>Hi 👋🏽!</p>
+            <!-- <p>Hi! I'm <span class="my-name">Kevin, Tchinda.</span></p> -->
+            <h2>I'm Kevin, <br>Tchinda Ndiffo</h2>
+            <p class="profession-container">
+              <span id="profession">A Software Developer</span>
+              <!-- <span class="sys">A System Administrator</span>
+              <span class="sec">A Cybersecurity Analyst</span>
+              <span class="it">An IT Specialist..</span> -->
+            </p>
+          </div>
+          <a href="./assets/docs/Kevin Tchinda Ndiffo - Resume - IT Analyst.pdf" class="hero-button" data-aos="fade-up" target="_blank">See Resume!</a>
+        </div>
+      </section>
+
+      <section id="about">
+        <div class="section-highlight" data-aos="fade-up">ABOUT</div>
+        <div class="about-container" data-aos="fade-up">
+          <div class="about-card">
+            <section class="about-content">
+              <h2> ~ About</h2>
+              <!-- About template -->
+              <p>
+                I'm a company IT analyst with 2+ years of experience exercising as a software developer, system administrator and software security analyst inorder 
+                to manage IT projects and enhancing business operations towards accomplishing its objectives.
+              </p>
+              <!-- <p>I am also a front-end developer intern at Y company.</p> -->
+              <p>I love learning new skills and enjoy all what is related to IT</p>
+            </section>
+
+            <section class="about-content tech-stack-section">
+              <h3>My tech Stack</h3>
+              <div class="tech-stack-grid">
+
+                <div class="tech-stack">
+                  <img src="./assets/icons/ionic.svg" alt="IonicFramework" />
+                </div>
+
+                <div class="tech-stack">
+                  <img src="./assets/icons/capacitor.svg" alt="Capacitor" />
+                </div>
+
+                <div class="tech-stack">
+                  <img src="./assets/icons/angular.svg" alt="Angular" />
+                </div>
+
+                <div class="tech-stack">
+                  <img src="./assets/icons/Django (1).svg" alt="Django" />
+                </div>
+
+                <div class="tech-stack">
+                  <img src="./assets/icons/html5.svg" alt="HTML5" />
+                </div>
+
+                <div class="tech-stack">
+                  <img src="./assets/icons/css.svg" alt="CSS3" />
+                </div>
+
+                <div class="tech-stack">
+                  <img src="./assets/icons/javascript.svg" alt="javascript-icon" />
+                </div>
+
+                <div class="tech-stack">
+                  <img src="./assets/icons/python.svg" alt="Python" />
+                </div>
+
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="portfolio">
+        <div class="section-highlight" data-aos="fade-up">Portfolio</div>
+        <div class="portfolio-container" data-aos="fade-up">
+          <div class="portfolio-card">
+            <div class="portfolio-content">
+              <h2> ~ Portfolio</h2>
+
+              <!-- input projects inside project container -->
+              <div class="project-container">
+                <section class="project-card">
+                  <img
+                    class="project-img"
+                    src="./assets/images/easyx-app-africa.png"
+                    alt="project-1"
+                  />
+                  
+                  <h3>EasyX App - Africa</h3>
+                  <h5>Project description</h5>
+                  <p>
+                    EasyX is an app that sums up news in a few words; and on the way, reveals a winning Africa.
+                  </p>
+
+                  <div class="project-card-links">
+                    <a href="https://apps.apple.com/ca/app/easyx-app/id1660903906" target="_blank">
+                      <img
+                        class="project-icons"
+                        src="./assets/icons/live-demo.svg"
+                        alt="live-demo"
+                      />
+                      Live demo
+                    </a>
+                    <!-- <a href="#">
+                      <img
+                        class="project-icons"
+                        src="./assets/icons/github-icon.svg"
+                        alt="live-demo"
+                      />
+                      Repository
+                    </a> -->
+                  </div>
+                </section>
+
+                <section class="project-card">
+                  <img
+                    class="project-img"
+                    src="./assets/images/ionic-icon.png"
+                    alt="project-1"
+                  />
+                  <h3>Budget Planner</h3>
+                  <h5>Project description</h5>
+                  <p>
+                    PERSONAL-FOOTAGE: Web app Layout for budget management. Just for exercising.
+                  </p>
+
+                  <div class="project-card-links">
+                    <a href="./assets/personal-footage/budget-planner/index.html">
+                      <img
+                        class="project-icons"
+                        src="./assets/icons/live-demo.svg"
+                        alt="live-demo"
+                      />
+                      Live demo
+                    </a>
+                    <!-- <a href="#">
+                      <img
+                        class="project-icons"
+                        src="./assets/icons/github-icon.svg"
+                        alt="live-demo"
+                      />
+                      Repository
+                    </a> -->
+                  </div>
+                </section>
+
+                <section class="project-card">
+                  <img
+                    class="project-img"
+                    src="./assets/images/ionic-icon.png"
+                    alt="project-1"
+                  />
+                  <h3>E-commerce Layout</h3>
+                  <h5>Project description</h5>
+                  <p>
+                    PERSONAL-FOOTAGE: Web app Layout for for E-commerce. Just for exercising.
+                  </p>
+
+                  <div class="project-card-links">
+                    <a href="./assets/personal-footage/ecommerce-layout/index.html">
+                      <img
+                        class="project-icons"
+                        src="./assets/icons/live-demo.svg"
+                        alt="live-demo"
+                      />
+                      Live demo
+                    </a>
+                    <!-- <a href="#">
+                      <img
+                        class="project-icons"
+                        src="./assets/icons/github-icon.svg"
+                        alt="live-demo"
+                      />
+                      Repository
+                    </a> -->
+                  </div>
+                </section>
+
+                <section class="project-card">
+                  <img
+                    class="project-img"
+                    src="./assets/images/ionic-icon.png"
+                    alt="project-2"
+                  />
+                  <h3>Chat Layout</h3>
+                  <h5>Project description</h5>
+                  <p>
+                    PERSONAL-FOOTAGE: Web app chat layout trying to mimick a well-known chat app. Just for exercising.
+                  </p>
+
+                  <div class="project-card-links">
+                    <a href="./assets/personal-footage/chat-layout/index.html">
+                      <img
+                        class="project-icons"
+                        src="./assets/icons/live-demo.svg"
+                        alt="live-demo"
+                      />
+                      Live demo
+                    </a>
+                    <!-- <a href="#">
+                      <img
+                        class="project-icons"
+                        src="./assets/icons/github-icon.svg"
+                        alt="live-demo"
+                      />
+                      Repository
+                    </a> -->
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact">
+        <h2 class="section-highlight" data-aos="fade-up">Contacts</h2>
+        <div class="contact-container" data-aos="fade-up">
+          <div class="contact-card">
+            <h2> ~ Contacts</h2>
+            <p>Feel free to reach me out through</p>
+
+            <div class="contact-links">
+              <a href="https://linkedin.com/in/kevinntchinda/" target="_blank">
+                <img
+                  class="contact-icons"
+                  src="./assets/icons/linkedin-icon.svg"
+                  alt="linkedin-icon"
+                />
+                LinkedIn
+              </a>
+
+              <!-- <a href="#">
+                <img
+                  class="contact-icons"
+                  src="./assets/icons/discord.svg"
+                  alt="linkedin-icon"
+                />
+                Discord
+              </a> -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-content">
+        ® By <a href="https://kevin-tchinda.github.io">Kevin, Tchinda Ndiffo</a> <br>
+        Inspired by
+        <a href="#" target="_blank">Charles Ching</a>
+      </div>
+    </footer>
+    
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>       
+      AOS.init({
+        once: true,
+        delay: 0
+      });
+    </script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons/dist/ionicons/ionicons.js"></script>
+  </body>
 </html>
