@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Image Captioning",
+    "github": "https://github.com/kevin-tchinda/image-captioning",
+    "demo": "https://huggingface.co/spaces/kevin-tchinda/image-caption-demo",
+    "tech": ["Python", "TensorFlow", "Keras"]
+  },
+  {
+    "id": 2,
+    "name": "Customer Churn Prediction",
+    "github": "https://github.com/kevin-tchinda/churn-prediction",
+    "demo": null,
+    "tech": ["Python", "XGBoost", "Scikit-learn"]
+  },
+  {
+    "id": 3,
+    "name": "Language Detection API",
+    "github": "https://github.com/kevin-tchinda/language-detection",
+    "demo": null,
+    "tech": ["Python", "FastAPI", "Docker"]
+  },
+  {
+    "id": 4,
+    "name": "Anime Character Generator",
+    "github": null,
+    "demo": "https://huggingface.co/spaces/kevin-tchinda/anime-generator",
+    "tech": ["Python", "Stable Diffusion", "Gradio"]
+  },
+  {
+    "id": 5,
+    "name": "AI Song Generator",
+    "github": "https://github.com/kevin-tchinda/song-generator",
+    "demo": null,
+    "tech": ["Python", "Transformers", "MusicLM"]
+  }
+]
