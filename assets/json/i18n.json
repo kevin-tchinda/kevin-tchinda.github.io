@@ -1,0 +1,114 @@
+{
+  "en": {
+    "whoami": {
+      "command": "whoami",
+      "name": "Kevin Tchinda",
+      "title": "AI Developer / Software Engineer",
+      "tagline": "Building intelligent tools that make people work smarter, not harder."
+    },
+    "projects": {
+      "command": "projects --list",
+      "filters": {
+        "all": "All",
+        "demo": "Demo",
+        "github": "GitHub"
+      },
+      "items_count": "{{count}} items"
+    },
+    "tech": {
+      "command": "tech --stack",
+      "categories": {
+        "languages": "Languages",
+        "ai_ml": "AI/ML",
+        "backend": "Backend & DevOps",
+        "frontend": "Frontend"
+      },
+      "items_count": "{{count}} items"
+    },
+    "about": {
+      "command": "about --me",
+      "bio": "AI Developer with a software engineering background. I build custom AI tools that fit into existing workflows, helping people work smarter.",
+      "location": "Based in Ottawa, Canada.",
+      "interests": "Interests: reading, swimming, anime, series.",
+      "contact": "Contact: kevin.tchinda@kevs.qinsera.ca",
+      "resume_button": "Download Resume"
+    },
+    "navigation": {
+      "projects": "Projects",
+      "tech": "Tech Stack",
+      "about": "About",
+      "back": "Back"
+    },
+    "footer": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "email": "Email"
+    },
+    "assistant": {
+      "responses": {
+        "about": "Kevin is an AI Developer and Software Engineer who builds custom AI tools that help people work smarter.",
+        "projects": "You can view my projects in the Projects section. They include Image Captioning, Churn Prediction, Language Detection, and more.",
+        "tech": "I work with Python, TensorFlow, PyTorch, FastAPI, Docker, React, Next.js, and many other technologies.",
+        "contact": "You can reach me at kevin.tchinda@kevs.qinsera.ca or via GitHub and LinkedIn links in the footer.",
+        "working": "I'm currently building interactive AI demos and expanding my portfolio with new projects.",
+        "default": "I'm not sure I understand. Try asking about my projects, tech stack, or how to contact me."
+      }
+    }
+  },
+  "fr": {
+    "whoami": {
+      "command": "whoami",
+      "name": "Kevin Tchinda",
+      "title": "Développeur IA / Ingénieur Logiciel",
+      "tagline": "Je construis des outils IA qui aident les gens à travailler plus intelligemment, pas plus durement."
+    },
+    "projects": {
+      "command": "projets --liste",
+      "filters": {
+        "all": "Tous",
+        "demo": "Démo",
+        "github": "GitHub"
+      },
+      "items_count": "{{count}} éléments"
+    },
+    "tech": {
+      "command": "tech --stack",
+      "categories": {
+        "languages": "Langages",
+        "ai_ml": "IA/ML",
+        "backend": "Backend & DevOps",
+        "frontend": "Frontend"
+      },
+      "items_count": "{{count}} éléments"
+    },
+    "about": {
+      "command": "à-propos --moi",
+      "bio": "Développeur IA avec une formation en génie logiciel. Je construis des outils IA sur mesure qui s'intègrent aux flux de travail existants.",
+      "location": "Basé à Ottawa, Canada.",
+      "interests": "Intérêts : lecture, natation, anime, séries.",
+      "contact": "Contact : kevin.tchinda@kevs.qinsera.ca",
+      "resume_button": "Télécharger CV"
+    },
+    "navigation": {
+      "projects": "Projets",
+      "tech": "Technologies",
+      "about": "À propos",
+      "back": "Retour"
+    },
+    "footer": {
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "email": "Email"
+    },
+    "assistant": {
+      "responses": {
+        "about": "Kevin est un développeur IA et ingénieur logiciel qui construit des outils intelligents pour aider les entreprises à travailler plus efficacement.",
+        "projects": "Vous pouvez voir mes projets dans la section Projets. Ils incluent la génération de légendes d'images, la prédiction d'attrition et la détection de langues.",
+        "tech": "Je travaille avec Python, TensorFlow, PyTorch, FastAPI, Docker, React, Next.js et bien d'autres technologies.",
+        "contact": "Vous pouvez me joindre à kevin.tchinda@kevs.qinsera.ca ou via les liens GitHub et LinkedIn dans le pied de page.",
+        "working": "Je développe actuellement des démos IA interactives et j'ajoute de nouveaux projets à mon portfolio.",
+        "default": "Je ne comprends pas bien. Essayez de demander quelque chose sur mes projets, ma stack technique ou comment me contacter."
+      }
+    }
+  }
+}

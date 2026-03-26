@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#C45C3A">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Kevin Tchinda | AI Developer</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Main Container -->
+    <div class="app">
+        <!-- Header -->
+        <header>
+            <div class="container">
+                <div class="header-inner">
+                    <div class="logo">
+                        <!-- <img src="assets/img/logo.svg" alt="Kevin Tchinda" class="logo-img" onerror="this.style.display='none'"> -->
+                        <span class="prompt">>_</span> kevin.tchinda
+                    </div>
+                    <div class="header-right">
+                        <button class="ai-toggle" id="aiToggle" aria-label="AI Assistant">
+                            <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container">
+            <!-- Dynamic View Container -->
+            <div id="viewContainer" class="view-container">
+                <!-- Content will be injected by JavaScript -->
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons" id="navButtons">
+                <button class="nav-btn" data-view="projects">Projects</button>
+                <button class="nav-btn" data-view="tech">Tech Stack</button>
+                <button class="nav-btn" data-view="about">About</button>
+            </div>
+        </main>
+
+        <!-- Playables Section - Moved OUTSIDE main to avoid view switching -->
+        <section id="playables" class="playables-section">
+            <div class="container">
+                <div class="playables-header">
+                    <div class="command-header">
+                        <span class="command-text">>_ playables --list</span>
+                    </div>
+                    <h2 class="playables-title">
+                        <span class="playables-title-word">P</span>
+                        <span class="playables-title-word">L</span>
+                        <span class="playables-title-word">A</span>
+                        <span class="playables-title-word">Y</span>
+                        <span class="playables-title-word">A</span>
+                        <span class="playables-title-word">B</span>
+                        <span class="playables-title-word">L</span>
+                        <span class="playables-title-word">E</span>
+                        <span class="playables-title-word">S</span>
+                    </h2>
+                </div>
+
+                <div class="playables-grid" id="playablesGrid">
+                    <!-- Playables will be injected by JavaScript -->
+                </div>
+
+                <div class="items-count playables-count" id="playablesCount">>_ loading playables...</div>
+            </div>
+        </section>
+
+        <!-- Footer (hidden by default, swipe to show) -->
+        <footer id="footer" class="footer hidden">
+            <div class="container">
+                <div class="footer-links">
+                    <a href="https://github.com/kevin-tchinda" target="_blank" rel="noopener noreferrer">
+                        <ion-icon name="logo-github"></ion-icon>
+                        GitHub
+                    </a>
+                    <a href="https://linkedin.com/in/kevinntchinda" target="_blank" rel="noopener noreferrer">
+                        <ion-icon name="logo-linkedin"></ion-icon>
+                        LinkedIn
+                    </a>
+                    <a href="mailto:kevin.tchinda@kevs.qinsera.ca">
+                        <ion-icon name="mail-outline"></ion-icon>
+                        Email
+                    </a>
+                </div>
+                <p class="footer-note">Swipe down to hide · Swipe up to show</p>
+            </div>
+        </footer>
+
+        <!-- AI Assistant Panel -->
+        <div id="aiPanel" class="ai-panel hidden">
+            <div class="ai-panel-header">
+                <span class="prompt">>_</span> AI Assistant
+                <button class="ai-close" id="aiClose">
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
+            <div class="ai-panel-content">
+                <div class="ai-messages" id="aiMessages">
+                    <div class="ai-message assistant">
+                        <span class="prompt">>_</span> How can I help you today?
+                    </div>
+                </div>
+                <div class="ai-suggestions" id="aiSuggestions">
+                    <button class="suggestion-chip" data-question="Tell me about Kevin">Tell me about Kevin</button>
+                    <button class="suggestion-chip" data-question="Show me your projects">Show me your projects</button>
+                    <button class="suggestion-chip" data-question="What technologies do you use?">What technologies do
+                        you use?</button>
+                    <button class="suggestion-chip" data-question="How can I contact you?">How can I contact
+                        you?</button>
+                    <button class="suggestion-chip" data-question="What are you working on?">What are you working
+                        on?</button>
+                </div>
+                <div class="ai-input-area">
+                    <input type="text" id="aiInput" placeholder="Type your question..." autocomplete="off">
+                    <button id="aiSend" class="btn-primary-small">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+</body>
+
+</html>
