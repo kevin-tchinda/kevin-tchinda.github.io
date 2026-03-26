@@ -5,6 +5,7 @@
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fkevin-tchinda.github.io&labelColor=%232C2824&countColor=%23C45C3A&style=flat-square&label=visitors)](https://visitorbadge.io/)
+[![Visitors](https://img.shields.io/badge/visitors-?style=flat-square&labelColor=%232C2824&color=%23C45C3A&logo=goatcounter)](https://kevin-tchinda.goatcounter.com)
 
 > Terminal-inspired personal website, features projects, interactive playables, and my website assistant.
 
