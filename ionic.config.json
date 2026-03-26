@@ -1,7 +1,0 @@
-{
-  "name": "kevin-tchinda",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular-standalone"
-}
