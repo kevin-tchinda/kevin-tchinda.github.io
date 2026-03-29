@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Music Visualizer | Kevin Tchinda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../common/playable-styles.css">
+    <style>
+        body {
+            overflow: hidden;
+        }
+        
+        .visualizer-container {
+            width: 100vw;
+            height: calc(100vh - 70px);
+            position: relative;
+            background-color: #0A0A0A;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 60%;
+            background-color: #1C1A17;
+            border-radius: 12px;
+            border: 1px solid #4A423C;
+        }
+        
+        .controls {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input {
+            position: absolute;
+            font-size: 100px;
+            opacity: 0;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+        }
+        
+        button, .file-label {
+            background-color: #C45C3A;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: #1C1A17;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 11px;
+        }
+        
+        button:hover, .file-label:hover {
+            background-color: #A54A2C;
+        }
+        
+        .mode-selector {
+            display: flex;
+            gap: 0.5rem;
+            background-color: #2C2824;
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+        
+        .mode-btn {
+            background: transparent;
+            color: #C8C0B5;
+            padding: 0.25rem 0.75rem;
+            font-size: 11px;
+        }
+        
+        .mode-btn.active {
+            background-color: #C45C3A;
+            color: #1C1A17;
+        }
+        
+        .status {
+            margin-top: 0.5rem;
+            font-size: 11px;
+            color: #A0968A;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            canvas {
+                height: 50%;
+            }
+            
+            button, .file-label {
+                padding: 0.4rem 0.8rem;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="playable-header">
+        <div class="container">
+            <div class="logo">
+                <span class="prompt">>_</span> kevin.tchinda
+            </div>
+            <a href="/" class="back-button">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="visualizer-container">
+        <canvas id="visualizerCanvas" width="800" height="400"></canvas>
+        
+        <div class="controls">
+            <button id="requestMicBtn">
+                <ion-icon name="mic-outline"></ion-icon>
+                Microphone
+            </button>
+            
+            <div class="file-input-wrapper">
+                <button id="uploadBtn" class="file-label">
+                    <ion-icon name="musical-notes-outline"></ion-icon>
+                    Importer audio
+                </button>
+                <input type="file" id="audioFile" accept="audio/*">
+            </div>
+            
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="bars">
+                    <ion-icon name="stats-chart-outline"></ion-icon>
+                    Bars
+                </button>
+                <button class="mode-btn" data-mode="circle">
+                    <ion-icon name="radio-outline"></ion-icon>
+                    Circle
+                </button>
+                <button class="mode-btn" data-mode="wave">
+                    <ion-icon name="water-outline"></ion-icon>
+                    Wave
+                </button>
+            </div>
+        </div>
+        <div class="status" id="statusMsg">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Microphone ou importer un fichier audio
+        </div>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="visualizer.js"></script>
+</body>
+</html>

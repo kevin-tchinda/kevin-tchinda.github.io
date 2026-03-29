@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Text Sentiment Analyzer | Kevin Tchinda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../common/playable-styles.css">
+    <style>
+        .analyzer-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        .command-header {
+            margin-bottom: 2rem;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 0.75rem;
+        }
+        
+        .command-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent-primary);
+        }
+        
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-label {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--accent-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .input-label ion-icon {
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        textarea {
+            width: 100%;
+            background-color: #2C2824;
+            border: 1px solid #4A423C;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #F5F0E8;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #C45C3A;
+        }
+        
+        .analyze-btn {
+            width: 100%;
+            background-color: #C45C3A;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #0A0A0A;
+            font-weight: 600;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .analyze-btn:hover:not(:disabled) {
+            background-color: #A54A2C;
+        }
+        
+        .result-area {
+            margin-top: 2rem;
+            background-color: #2C2824;
+            border: 1px solid #4A423C;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .sentiment-badge {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .sentiment-positive {
+            background-color: #2A5A3A;
+            color: #8BCB8A;
+        }
+        
+        .sentiment-negative {
+            background-color: #5A2A2A;
+            color: #F68B8B;
+        }
+        
+        .sentiment-neutral {
+            background-color: #4A423C;
+            color: #E6B85C;
+        }
+        
+        .confidence-bar {
+            background-color: #1C1A17;
+            border-radius: 4px;
+            height: 6px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .confidence-fill.positive {
+            background-color: #8BCB8A;
+        }
+        
+        .confidence-fill.negative {
+            background-color: #F68B8B;
+        }
+        
+        .confidence-fill.neutral {
+            background-color: #E6B85C;
+        }
+        
+        .score-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .score-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #0A0A0A;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .status {
+            margin-top: 1rem;
+            font-size: 11px;
+            color: #E6B85C;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .example-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .example-btn {
+            background-color: transparent;
+            border: 1px solid #4A423C;
+            color: #C8C0B5;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .example-btn:hover {
+            border-color: #C45C3A;
+            color: #C45C3A;
+        }
+    </style>
+</head>
+<body>
+    <div class="playable-header">
+        <div class="container">
+            <div class="logo">
+                <span class="prompt">>_</span> kevin.tchinda
+            </div>
+            <a href="/" class="back-button">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="analyzer-container">
+        <div class="command-header">
+            <span class="command-text">>_ sentiment-analyzer --analyze</span>
+        </div>
+        
+        <div class="input-group">
+            <div class="input-label">
+                <ion-icon name="text-outline"></ion-icon>
+                Texte à analyser
+            </div>
+            <textarea id="textInput" rows="5" placeholder="Entrez un texte pour analyser son sentiment..."></textarea>
+            <div class="example-buttons">
+                <button class="example-btn" data-text="I love this! It's absolutely amazing!">Positif</button>
+                <button class="example-btn" data-text="This is terrible, I hate it.">Négatif</button>
+                <button class="example-btn" data-text="The weather is okay, nothing special.">Neutre</button>
+            </div>
+        </div>
+        
+        <button id="analyzeBtn" class="analyze-btn">
+            <ion-icon name="analytics-outline"></ion-icon>
+            Analyser le sentiment
+        </button>
+        
+        <div id="status" class="status hidden"></div>
+        
+        <div id="resultArea" class="result-area hidden">
+            <div id="sentimentBadge" class="sentiment-badge"></div>
+            <div class="score-label">Confiance</div>
+            <div class="confidence-bar">
+                <div id="confidenceFill" class="confidence-fill" style="width: 0%"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                <span class="score-label">Négatif</span>
+                <span id="scoreValue" class="score-value">0.00</span>
+                <span class="score-label">Positif</span>
+            </div>
+            <div style="margin-top: 1rem;">
+                <div class="score-label">Interprétation</div>
+                <p id="interpretation" style="font-size: 12px; color: var(--text-secondary); margin-top: 0.5rem;"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity@latest/dist/toxicity.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="analyzer.js"></script>
+</body>
+</html>

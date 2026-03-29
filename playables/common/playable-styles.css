@@ -1,0 +1,86 @@
+/* Shared styles for all playables */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #1C1A17;
+    color: #F5F0E8;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', system-ui, sans-serif;
+    font-size: 12px;
+    line-height: 1.3333733333;
+    min-height: 100vh;
+}
+
+/* Playable Header with Back Button */
+.playable-header {
+    border-bottom: 1px solid #4A423C;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    background-color: #1C1A17;
+    z-index: 100;
+}
+
+.playable-header .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.playable-header .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: #F5F0E8;
+}
+
+.playable-header .logo .prompt {
+    color: #C45C3A;
+    margin-right: 0.25rem;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1px solid #4A423C;
+    color: #C8C0B5;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.back-button:hover {
+    border-color: #C45C3A;
+    color: #C45C3A;
+}
+
+/* Playable Container */
+.playable-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .playable-header .container {
+        padding: 0 1rem;
+    }
+    
+    .playable-container {
+        padding: 0 1rem;
+    }
+}

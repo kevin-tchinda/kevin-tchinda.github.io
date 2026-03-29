@@ -21,21 +21,24 @@ const intentResponses = {
 // Playables Data
 // ============================================
 const playablesData = [
-    {
-        id: 1,
-        title: "AI Art Generator",
-        description: "Create unique artwork using TensorFlow.js style transfer",
-        type: "ml",
-        icon: "color-palette-outline",
-        component: "aiArt"
-    },
+    // TF.js models doesn't expose efficient GAN / Diffusion models
+    // Through their API, would need to create it from scratch later...
+
+    // {
+    //     id: 1,
+    //     title: "AI Art Generator",
+    //     description: "Create unique artwork using TensorFlow.js style transfer",
+    //     type: "ml",
+    //     icon: "color-palette-outline",
+    //     path: "/playables/ai-art-generator/"
+    // },
     {
         id: 2,
-        title: "Classic Snake Game",
-        description: "Retro snake game with growing difficulty",
+        title: "Asteroid Dodger",
+        description: "Avoid asteroids and survive as long as you can",
         type: "game",
         icon: "game-controller-outline",
-        component: "snakeGame"
+        path: "/playables/asteroid-dodger/"
     },
     {
         id: 3,
@@ -43,7 +46,7 @@ const playablesData = [
         description: "Analyze the emotional tone of any text using AI",
         type: "tool",
         icon: "analytics-outline",
-        component: "sentimentAnalyzer"
+        path: "/playables/sentiment-analyzer/"
     },
     {
         id: 4,
@@ -51,7 +54,7 @@ const playablesData = [
         description: "Train a neural net to guess colors from text",
         type: "ml",
         icon: "color-filter-outline",
-        component: "colorGuesser"
+        path: "/playables/color-guesser/"
     },
     {
         id: 5,
@@ -59,7 +62,7 @@ const playablesData = [
         description: "Real-time audio visualization with Web Audio API",
         type: "tool",
         icon: "musical-notes-outline",
-        component: "musicVisualizer"
+        path: "/playables/music-visualizer/"
     },
     {
         id: 6,
@@ -67,8 +70,16 @@ const playablesData = [
         description: "Create pixel art with AI-assisted coloring",
         type: "game",
         icon: "brush-outline",
-        component: "pixelArt"
-    }
+        path: "/playables/pixel-art-studio/"
+    },
+    {
+        id: 7,
+        title: "Classic Snake Game",
+        description: "Retro snake game with growing difficulty",
+        type: "game",
+        icon: "game-controller-outline",
+        path: "/playables/snake-game/"
+    },
 ];
 
 // ============================================
@@ -90,12 +101,12 @@ async function fetchData() {
         fetch('assets/json/projects.json'),
         fetch('assets/json/i18n.json')
     ]);
-    
+
     projectsData = await projectsRes.json();
     i18n = await i18nRes.json();
-    
+
     currentLanguage = detectLanguage();
-    
+
     renderCurrentView();
 }
 
@@ -105,9 +116,9 @@ async function fetchData() {
 function renderCurrentView() {
     const container = document.getElementById('viewContainer');
     if (!container) return;
-    
+
     const t = i18n?.[currentLanguage] || i18n?.en;
-    
+
     if (currentView === 'whoami') {
         container.innerHTML = `
             <div class="command-header">
@@ -118,7 +129,7 @@ function renderCurrentView() {
             <div class="whoami-tagline">>_ ${t?.whoami?.tagline || 'Building intelligent tools that make people work smarter, not harder.'}</div>
         `;
         updateNavButtons(false);
-    } 
+    }
     else if (currentView === 'projects') {
         renderProjectsView(container, t);
         updateNavButtons(true);
@@ -139,7 +150,7 @@ function renderProjectsView(container, t) {
         if (currentFilter === 'github') return project.github;
         return true;
     });
-    
+
     let projectsHtml = `
         <div class="command-header">
             <span class="command-text">>_ ${t?.projects?.command || 'projects --list'}</span>
@@ -151,7 +162,7 @@ function renderProjectsView(container, t) {
         </div>
         <ul class="project-list">
     `;
-    
+
     filteredProjects.forEach(project => {
         projectsHtml += `
             <li class="project-item">
@@ -166,14 +177,14 @@ function renderProjectsView(container, t) {
             </li>
         `;
     });
-    
+
     projectsHtml += `
         </ul>
         <div class="items-count">>_ ${filteredProjects.length} ${t?.projects?.items_count?.replace('{{count}}', '') || 'items'}</div>
     `;
-    
+
     container.innerHTML = projectsHtml;
-    
+
     document.querySelectorAll('.filter-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
             currentFilter = chip.dataset.filter;
@@ -189,13 +200,13 @@ function renderTechView(container, t) {
         backend: ['FastAPI', 'Docker', 'Kubernetes', 'PostgreSQL'],
         frontend: ['React', 'Next.js', 'Tailwind CSS', 'Ionic']
     };
-    
+
     let techHtml = `
         <div class="command-header">
             <span class="command-text">>_ ${t?.tech?.command || 'tech --stack'}</span>
         </div>
     `;
-    
+
     Object.entries(techCategories).forEach(([key, items]) => {
         const categoryName = t?.tech?.categories?.[key] || key.replace('_', ' & ').toUpperCase();
         techHtml += `
@@ -207,16 +218,16 @@ function renderTechView(container, t) {
             </div>
         `;
     });
-    
+
     const totalItems = Object.values(techCategories).flat().length;
     techHtml += `<div class="items-count">>_ ${totalItems} ${t?.tech?.items_count?.replace('{{count}}', '') || 'items'}</div>`;
-    
+
     container.innerHTML = techHtml;
 }
 
 function renderAboutView(container, t) {
     const resumePath = 'assets/docs/Kevin_Tchinda_Resume.pdf';
-    
+
     container.innerHTML = `
         <div class="command-header">
             <span class="command-text">>_ ${t?.about?.command || 'about --me'}</span>
@@ -239,9 +250,9 @@ function renderAboutView(container, t) {
 function updateNavButtons(showBack) {
     const navContainer = document.getElementById('navButtons');
     if (!navContainer) return;
-    
+
     const t = i18n?.[currentLanguage] || i18n?.en;
-    
+
     if (showBack) {
         navContainer.innerHTML = `
             <button class="nav-btn back-btn" data-view="back">${t?.navigation?.back || 'Back'}</button>
@@ -256,7 +267,7 @@ function updateNavButtons(showBack) {
             <button class="nav-btn" data-view="about">${t?.navigation?.about || 'About'}</button>
         `;
     }
-    
+
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const view = btn.dataset.view;
@@ -278,9 +289,9 @@ function updateNavButtons(showBack) {
 function renderPlayables() {
     const grid = document.getElementById('playablesGrid');
     const countSpan = document.getElementById('playablesCount');
-    
+
     if (!grid) return;
-    
+
     grid.innerHTML = playablesData.map(playable => `
         <div class="playable-card" data-playable-id="${playable.id}">
             <div class="playable-icon">
@@ -295,9 +306,9 @@ function renderPlayables() {
             </button>
         </div>
     `).join('');
-    
+
     countSpan.innerHTML = `>_ ${playablesData.length} playables available`;
-    
+
     document.querySelectorAll('.play-button').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -315,53 +326,56 @@ let currentModal = null;
 function openPlayableModal(playableId) {
     const playable = playablesData.find(p => p.id === playableId);
     if (!playable) return;
-    
-    if (currentModal) {
-        currentModal.remove();
-    }
-    
-    const modal = document.createElement('div');
-    modal.className = 'playable-modal';
-    modal.innerHTML = `
-        <div class="playable-modal-content">
-            <button class="playable-modal-close">
-                <ion-icon name="close-outline"></ion-icon>
-            </button>
-            <div class="command-header">
-                <span class="command-text">>_ play ${playable.title.toLowerCase().replace(/\s/g, '-')}</span>
-            </div>
-            <div id="playable-embed" style="min-height: 400px;">
-                <div style="text-align: center; padding: 2rem;">
-                    <div class="playable-icon" style="font-size: 4rem;">
-                        <ion-icon name="${playable.icon}"></ion-icon>
-                    </div>
-                    <h3 style="margin: 1rem 0;">${playable.title}</h3>
-                    <p style="color: var(--text-muted);">Interactive demo coming soon.</p>
-                    <p style="font-size: 11px; margin-top: 1rem; color: var(--accent-secondary);">TensorFlow.js integration in progress</p>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    currentModal = modal;
-    
-    setTimeout(() => modal.classList.add('active'), 10);
-    
-    const closeBtn = modal.querySelector('.playable-modal-close');
-    closeBtn.addEventListener('click', () => {
-        modal.classList.remove('active');
-        setTimeout(() => modal.remove(), 300);
-        currentModal = null;
-    });
-    
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.remove('active');
-            setTimeout(() => modal.remove(), 300);
-            currentModal = null;
-        }
-    });
+
+    // if (currentModal) {
+    //     currentModal.remove();
+    // }
+
+    // const modal = document.createElement('div');
+    // modal.className = 'playable-modal';
+    // modal.innerHTML = `
+    //     <div class="playable-modal-content">
+    //         <button class="playable-modal-close">
+    //             <ion-icon name="close-outline"></ion-icon>
+    //         </button>
+    //         <div class="command-header">
+    //             <span class="command-text">>_ play ${playable.title.toLowerCase().replace(/\s/g, '-')}</span>
+    //         </div>
+    //         <div id="playable-embed" style="min-height: 400px;">
+    //             <div style="text-align: center; padding: 2rem;">
+    //                 <div class="playable-icon" style="font-size: 4rem;">
+    //                     <ion-icon name="${playable.icon}"></ion-icon>
+    //                 </div>
+    //                 <h3 style="margin: 1rem 0;">${playable.title}</h3>
+    //                 <p style="color: var(--text-muted);">Interactive demo coming soon.</p>
+    //                 <p style="font-size: 11px; margin-top: 1rem; color: var(--accent-secondary);">TensorFlow.js integration in progress</p>
+    //             </div>
+    //         </div>
+    //     </div>
+    // `;
+
+    // document.body.appendChild(modal);
+    // currentModal = modal;
+
+    // setTimeout(() => modal.classList.add('active'), 10);
+
+    // const closeBtn = modal.querySelector('.playable-modal-close');
+    // closeBtn.addEventListener('click', () => {
+    //     modal.classList.remove('active');
+    //     setTimeout(() => modal.remove(), 300);
+    //     currentModal = null;
+    // });
+
+    // modal.addEventListener('click', (e) => {
+    //     if (e.target === modal) {
+    //         modal.classList.remove('active');
+    //         setTimeout(() => modal.remove(), 300);
+    //         currentModal = null;
+    //     }
+    // });
+
+    // Redirect to the playable page
+    window.location.href = playable.path;
 }
 
 // ============================================
@@ -370,7 +384,7 @@ function openPlayableModal(playableId) {
 function processUserInput(input) {
     const lowerInput = input.toLowerCase();
     const t = i18n?.[currentLanguage]?.assistant?.responses || intentResponses;
-    
+
     if (lowerInput.includes('about') || lowerInput.includes('who') || lowerInput.includes('background') || lowerInput.includes('bio')) {
         return t.about || intentResponses.about;
     }
@@ -386,7 +400,7 @@ function processUserInput(input) {
     if (lowerInput.includes('working') || lowerInput.includes('current') || lowerInput.includes('building')) {
         return t.working || intentResponses.working;
     }
-    
+
     return t.default || intentResponses.default;
 }
 
@@ -398,27 +412,27 @@ async function sendMessage() {
     const input = document.getElementById('aiInput');
     const messagesContainer = document.getElementById('aiMessages');
     const question = input.value.trim();
-    
+
     if (!question) return;
-    
+
     const userMessageDiv = document.createElement('div');
     userMessageDiv.className = 'ai-message user';
     userMessageDiv.textContent = question;
     messagesContainer.appendChild(userMessageDiv);
-    
+
     input.value = '';
-    
+
     const typingDiv = document.createElement('div');
     typingDiv.className = 'ai-message assistant';
     typingDiv.innerHTML = '<span class="prompt">>_</span> Thinking...';
     messagesContainer.appendChild(typingDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    
+
     setTimeout(async () => {
         typingDiv.remove();
-        
+
         const intentResponse = processUserInput(question);
-        
+
         const responseDiv = document.createElement('div');
         responseDiv.className = 'ai-message assistant';
         responseDiv.innerHTML = `<span class="prompt">>_</span> ${intentResponse}`;
@@ -436,18 +450,18 @@ let footerVisible = false;
 function initSwipeFooter() {
     const footer = document.getElementById('footer');
     if (!footer) return;
-    
+
     footer.classList.add('hidden');
     footerVisible = false;
-    
+
     document.addEventListener('touchstart', (e) => {
         touchStartY = e.touches[0].clientY;
     });
-    
+
     document.addEventListener('touchend', (e) => {
         const touchEndY = e.changedTouches[0].clientY;
         const diff = touchEndY - touchStartY;
-        
+
         if (diff < -50) {
             footer.classList.remove('hidden');
             footerVisible = true;
@@ -468,29 +482,29 @@ function initAIPanel() {
     const aiSend = document.getElementById('aiSend');
     const aiInput = document.getElementById('aiInput');
     const suggestionChips = document.querySelectorAll('.suggestion-chip');
-    
+
     if (aiToggle) {
         aiToggle.addEventListener('click', () => {
             aiPanel.classList.toggle('hidden');
         });
     }
-    
+
     if (aiClose) {
         aiClose.addEventListener('click', () => {
             aiPanel.classList.add('hidden');
         });
     }
-    
+
     if (aiSend) {
         aiSend.addEventListener('click', sendMessage);
     }
-    
+
     if (aiInput) {
         aiInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
     }
-    
+
     suggestionChips.forEach(chip => {
         chip.addEventListener('click', () => {
             const question = chip.dataset.question;
