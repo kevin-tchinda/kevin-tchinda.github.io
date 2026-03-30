@@ -33,5 +33,13 @@
     "github": "https://github.com/kevin-tchinda/song-generator",
     "demo": null,
     "tech": ["Python", "Transformers", "MusicLM"]
-  }
+  },
+  {
+  "id": 6,
+  "name": "Civil Code Assistant",
+  "description": "Ask questions about the Civil Code of Québec and get answers based on official articles.",
+  "github": "https://github.com/kevin-tchinda/kevin-tchinda.github.io/tree/gh-pages/serverless",
+  "demo": "/projects/legal-assistant",
+  "tech": ["Python", "FastAPI", "ChromaDB", "OpenAI SDK", "RailWay"]
+}
 ]
