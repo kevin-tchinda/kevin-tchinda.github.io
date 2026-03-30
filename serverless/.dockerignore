@@ -9,10 +9,7 @@ __pycache__
 dist
 build
 .env
-scraper.py
-embed.py
-<!-- requirements.txt      # not needed at runtime, but it's small; -->
-README.md
+
 *.md
 *.log
 .git
