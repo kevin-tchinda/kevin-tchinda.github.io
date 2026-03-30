@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Ottawa Collision Zones | Kevin Tchinda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../playables/common/playable-styles.css">
+    <style>
+        #map {
+            height: calc(100vh - 280px);
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 1rem;
+        }
+        .route-panel {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .route-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.5rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+        .route-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        .route-button {
+            background-color: var(--accent-primary);
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            color: var(--bg-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .route-button:hover {
+            background-color: #A54A2C;
+        }
+        .legend {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+        }
+        .legend h4 {
+            margin: 0 0 0.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-secondary);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        .legend-color.circle-critique { background-color: #ffeb3b; border: 1px solid #aaa; }
+        .legend-color.circle-high { background-color: #d32f2f; }
+        .legend-color.circle-moderate { background-color: #f57c00; }
+        .legend-color.circle-low { background-color: #388e3c; }
+        .legend-color.marker-injury { background-color: #d32f2f; width: 12px; height: 12px; border-radius: 0; transform: rotate(45deg); }
+        .legend-color.marker-material { background-color: #ffb74d; width: 12px; height: 12px; border-radius: 0; transform: rotate(45deg); }
+        .legend-text {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+        .warning-text {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+        }
+        @media (max-width: 768px) {
+            .legend {
+                bottom: 10px;
+                right: 10px;
+                padding: 0.5rem;
+            }
+            #map {
+                height: calc(100vh - 320px);
+            }
+            .route-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="playable-header">
+        <div class="container">
+            <div class="logo">
+                <span class="prompt">>_</span> kevin.tchinda
+            </div>
+            <a href="/" class="back-button">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="command-header">
+            <span class="command-text">>_ ottawa-collision-zones --map</span>
+        </div>
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+            High‑risk traffic accident zones in Ottawa. Enter a start and end address to see if your route passes through any collision zones.
+        </p>
+    </div>
+
+    <div class="container">
+        <div class="route-panel">
+            <input type="text" id="source" class="route-input" placeholder="Start address" autocomplete="off">
+            <input type="text" id="destination" class="route-input" placeholder="Destination address" autocomplete="off">
+            <button id="getRoute" class="route-button">Get directions</button>
+        </div>
+        <div id="map"></div>
+        <div id="routeWarning" class="warning-text"></div>
+        <div class="legend">
+            <h4>Legend</h4>
+            <div class="legend-item"><div class="legend-color circle-critique"></div><span class="legend-text">Critical (yellow)</span></div>
+            <div class="legend-item"><div class="legend-color circle-high"></div><span class="legend-text">High (red)</span></div>
+            <div class="legend-item"><div class="legend-color circle-moderate"></div><span class="legend-text">Moderate (orange)</span></div>
+            <div class="legend-item"><div class="legend-color circle-low"></div><span class="legend-text">Low (green)</span></div>
+            <div class="legend-item"><div class="legend-color marker-injury"></div><span class="legend-text">Injury accident</span></div>
+            <div class="legend-item"><div class="legend-color marker-material"></div><span class="legend-text">Property damage only</span></div>
+        </div>
+    </div>
+
+    
+    <!-- `API_KEY` restricted only to this app -->
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAuVJNONNuWyzMUEZgI6Om1qHTZ3XLvYcI&libraries=visualization,places&callback=initMap" async defer></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

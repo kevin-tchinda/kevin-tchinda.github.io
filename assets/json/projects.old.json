@@ -18,9 +18,23 @@
   {
     "id": 3,
     "name": "Language Detection API",
-    "github": "https://github.com/kevin-tchinda/language-detection-nlp",
-    "demo": "https://language-detection-nlp.up.railway.app",
-    "tech": ["Python", "BiLSTM", "Streamlit", "Railway"]
+    "github": "https://github.com/kevin-tchinda/language-detection",
+    "demo": null,
+    "tech": ["Python", "FastAPI", "Docker"]
+  },
+  {
+    "id": 1,
+    "name": "Image Captioning",
+    "github": null,
+    "demo": null,
+    "tech": ["Python", "TensorFlow", "Keras"]
+  },
+  {
+    "id": 2,
+    "name": "Customer Churn Prediction",
+    "github": null,
+    "demo": null,
+    "tech": ["Python", "XGBoost", "Scikit-learn"]
   },
   {
     "id": 4,

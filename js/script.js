@@ -64,22 +64,22 @@ const playablesData = [
         icon: "musical-notes-outline",
         path: "/playables/music-visualizer/"
     },
-    {
-        id: 6,
-        title: "Pixel Art Studio",
-        description: "Create pixel art with AI-assisted coloring",
-        type: "game",
-        icon: "brush-outline",
-        path: "/playables/pixel-art-studio/"
-    },
-    {
-        id: 7,
-        title: "Classic Snake Game",
-        description: "Retro snake game with growing difficulty",
-        type: "game",
-        icon: "game-controller-outline",
-        path: "/playables/snake-game/"
-    },
+    // {
+    //     id: 6,
+    //     title: "Pixel Art Studio",
+    //     description: "Create pixel art with AI-assisted coloring",
+    //     type: "game",
+    //     icon: "brush-outline",
+    //     path: "/playables/pixel-art-studio/"
+    // },
+    // {
+    //     id: 7,
+    //     title: "Classic Snake Game",
+    //     description: "Retro snake game with growing difficulty",
+    //     type: "game",
+    //     icon: "game-controller-outline",
+    //     path: "/playables/snake-game/"
+    // },
 ];
 
 // ============================================
