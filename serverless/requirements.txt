@@ -4,3 +4,4 @@ chromadb
 python-dotenv
 langdetect
 requests
+sentence-transformers

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import chromadb
+from sentence_transformers import SentenceTransformer
 from langdetect import detect, LangDetectException
 import os
 import requests
@@ -8,26 +9,30 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Authenticate to Hugging Face Hub if token is provided
+HF_API_KEY = os.getenv("HF_API_KEY")
+if HF_API_KEY:
+    os.environ["HF_TOKEN"] = HF_API_KEY
+
 app = FastAPI()
 
 # Configuration
 DB_PATH = "./data/chroma_db"
 COLLECTION_NAME = "civil_code_quebec"
-MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+MODEL_NAME = "distiluse-base-multilingual-cased"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-HF_API_KEY = os.getenv("HF_API_KEY")
-HF_URL = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{MODEL_NAME}"
 
-# ChromaDB client – no embedding function attached (we'll pass vectors manually)
+# Load the embedding model once
+model = SentenceTransformer(MODEL_NAME)
+
+# Connect to ChromaDB (no embedding function needed; we pass vectors manually)
 client = chromadb.PersistentClient(path=DB_PATH)
 collection = client.get_collection(name=COLLECTION_NAME)
 
-# Request schema
 class QueryRequest(BaseModel):
     text: str
     language: str = "auto"   # "auto", "fr", or "en"
 
-# Helper: detect language
 def detect_language(text: str) -> str:
     try:
         lang = detect(text)
@@ -35,15 +40,9 @@ def detect_language(text: str) -> str:
     except LangDetectException:
         return "fr"
 
-# Helper: get query embedding from Hugging Face Inference API
 def get_embedding(text: str) -> list:
-    headers = {"Authorization": f"Bearer {HF_API_KEY}"}
-    payload = {"inputs": text, "options": {"wait_for_model": True}}
-    response = requests.post(HF_URL, headers=headers, json=payload, timeout=30)
-    response.raise_for_status()
-    return response.json()   # returns a list of floats
+    return model.encode(text).tolist()
 
-# Helper: build prompt for LLM
 def build_prompt(question: str, context: str, lang: str) -> str:
     if lang == "en":
         return f"""You are a legal assistant specialized in the Civil Code of Québec.
@@ -73,7 +72,6 @@ CONTEXTE:
 
 RÉPONSE:"""
 
-# Helper: call OpenAI API
 def call_openai(prompt: str) -> str:
     if not OPENAI_API_KEY:
         raise HTTPException(status_code=500, detail="Missing OPENAI_API_KEY")
@@ -97,7 +95,6 @@ def call_openai(prompt: str) -> str:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM error: {str(e)}")
 
-# Root endpoint
 @app.get("/")
 async def root():
     return {
@@ -108,19 +105,17 @@ async def root():
         }
     }
 
-# Main ask endpoint
 @app.post("/ask")
 async def ask_legal(req: QueryRequest):
-    # Language resolution
     lang = req.language if req.language in ("fr", "en") else detect_language(req.text)
 
-    # Get query embedding from Hugging Face API
+    # Get query embedding using the local model
     try:
         query_embedding = get_embedding(req.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Embedding error: {str(e)}")
 
-    # Retrieve relevant articles using the vector
+    # Retrieve from ChromaDB using the vector
     try:
         results = collection.query(
             query_embeddings=[query_embedding],
@@ -135,11 +130,9 @@ async def ask_legal(req: QueryRequest):
     if not documents:
         raise HTTPException(status_code=404, detail="No relevant articles found")
 
-    # Build context with article numbers
     context_blocks = [f"[Article {meta['number']}]\n{doc}" for doc, meta in zip(documents, metadatas)]
     context = "\n\n".join(context_blocks)
 
-    # Generate answer with OpenAI
     prompt = build_prompt(req.text, context, lang)
     answer = call_openai(prompt)
 
@@ -149,9 +142,6 @@ async def ask_legal(req: QueryRequest):
         "articles_used": [m["number"] for m in metadatas],
         "answer": answer
     }
-
-
-
 
 
 

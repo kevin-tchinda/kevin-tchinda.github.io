@@ -9,8 +9,9 @@ __pycache__
 dist
 build
 .env
-
-*.md
-*.log
 .git
 .gitignore
+*.md
+*.log
+scraper.py
+embed.py
