@@ -2,3 +2,5 @@ serverless/env
 serverless/.env
 __pycache__/*
 serverless/__pycache__/*
+.env
+env
