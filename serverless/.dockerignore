@@ -1,8 +1,19 @@
-__pycache__/
+__pycache__
 *.pyc
 *.pyo
 *.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
 .env
+scraper.py
+embed.py
+<!-- requirements.txt      # not needed at runtime, but it's small; -->
+README.md
+*.md
+*.log
 .git
 .gitignore
-node_modules/
