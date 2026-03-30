@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import chromadb
 from sentence_transformers import SentenceTransformer
@@ -6,50 +7,61 @@ from langdetect import detect, LangDetectException
 import os
 import requests
 from dotenv import load_dotenv
-from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
-# Authenticate to Hugging Face Hub if token is provided
-HF_API_KEY = os.getenv("HF_API_KEY")
-if HF_API_KEY:
-    os.environ["HF_TOKEN"] = HF_API_KEY
-
 app = FastAPI()
 
-# ... after creating `app = FastAPI()`
-
-# Allow requests from your frontend origins
+# CORS
 origins = [
     "https://kevin-tchinda.github.io",
-    "http://localhost:3000",   # for local testing
-    "http://localhost:8000",   # if you test locally
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://0.0.0.0:3000",
+    "http://0.0.0.0:8000",
 ]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,          # or ["*"] to allow all (not recommended for production)
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configuration
 DB_PATH = "./data/chroma_db"
 COLLECTION_NAME = "civil_code_quebec"
 MODEL_NAME = "distiluse-base-multilingual-cased"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Load the embedding model once
 model = SentenceTransformer(MODEL_NAME)
 
-# Connect to ChromaDB (no embedding function needed; we pass vectors manually)
 client = chromadb.PersistentClient(path=DB_PATH)
 collection = client.get_collection(name=COLLECTION_NAME)
 
 class QueryRequest(BaseModel):
     text: str
-    language: str = "auto"   # "auto", "fr", or "en"
+    language: str = "auto"
+
+# Simple heuristic to detect conversational/non‑legal queries
+def is_conversational(text: str) -> bool:
+    conversational_patterns = [
+        "bonjour", "salut", "coucou", "hello", "hi", "hey", "comment ça va",
+        "how are you", "ça va", "what's up", "yo", "merci", "thanks", "cool",
+        "super", "génial", "awesome", "ok", "d'accord"
+    ]
+    lower = text.lower().strip()
+    # Short greetings or simple acknowledgements
+    if any(p in lower for p in conversational_patterns) and len(lower) < 40:
+        return True
+    # Also if the query doesn't contain any legal keywords (very simple)
+    legal_keywords = ["article", "code civil", "droit", "loi", "locataire", "propriétaire",
+                      "contrat", "obligation", "responsabilité", "vente", "louer", "bail",
+                      "assurance", "succession", "testament", "divorce", "mariage", "enfant"]
+    if not any(k in lower for k in legal_keywords):
+        # Very short queries that aren't legal
+        if len(lower.split()) <= 3:
+            return True
+    return False
 
 def detect_language(text: str) -> str:
     try:
@@ -64,52 +76,60 @@ def get_embedding(text: str) -> list:
 def build_prompt(question: str, context: str, lang: str) -> str:
     if lang == "en":
         return f"""You are a legal assistant specialized in the Civil Code of Québec.
-Answer ONLY using the provided articles.
-Cite article numbers explicitly.
-Translate excerpts if needed.
+Answer the question in 1-2 sentences using ONLY the provided articles if relevant.
+Cite article numbers. If no article is relevant, say you don't have information.
 Add a disclaimer that this is not legal advice.
 
 QUESTION:
 {question}
 
-CONTEXT:
+RELEVANT ARTICLES:
 {context}
 
 ANSWER:"""
     else:
         return f"""Tu es un assistant juridique spécialisé dans le Code civil du Québec.
-Réponds UNIQUEMENT avec les articles fournis.
-Cite les numéros d'articles.
+Réponds en 1-2 phrases en utilisant UNIQUEMENT les articles fournis s'ils sont pertinents.
+Cite les numéros d'articles. Si aucun article n'est pertinent, dis que tu n'as pas l'information.
 Ajoute un avertissement que ce n'est pas un avis juridique.
 
 QUESTION:
 {question}
 
-CONTEXTE:
+ARTICLES PERTINENTS:
 {context}
 
 RÉPONSE:"""
 
-def call_openai(prompt: str) -> str:
+def call_openai(prompt: str, is_conversational: bool = False) -> str:
     if not OPENAI_API_KEY:
         raise HTTPException(status_code=500, detail="Missing OPENAI_API_KEY")
     try:
+        system_message = (
+            "You are a friendly assistant specialized in the Civil Code of Québec. "
+            "Keep answers very short and friendly. If the user greets you, respond warmly."
+            if is_conversational else
+            "You are a legal assistant specialized in the Civil Code of Québec. "
+            "Answer concisely, using only the provided articles if relevant. Cite article numbers. "
+            "Add a disclaimer that this is not legal advice."
+        )
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
             json={
                 "model": "gpt-4o-mini",
-                "messages": [{"role": "user", "content": prompt}],
+                "messages": [
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": prompt}
+                ],
                 "temperature": 0.3,
-                "max_completion_tokens": 800
+                "max_completion_tokens": 200
             },
             timeout=15
         )
         response.raise_for_status()
         data = response.json()
         return data["choices"][0]["message"]["content"]
-    except requests.exceptions.Timeout:
-        raise HTTPException(status_code=504, detail="LLM request timed out")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM error: {str(e)}")
 
@@ -127,32 +147,57 @@ async def root():
 async def ask_legal(req: QueryRequest):
     lang = req.language if req.language in ("fr", "en") else detect_language(req.text)
 
-    # Get query embedding using the local model
+    # Step 1: If clearly conversational, skip retrieval and use friendly response
+    if is_conversational(req.text):
+        friendly_prompt = (
+            "The user just greeted you or said something conversational. "
+            "Respond warmly in the same language, inviting them to ask a legal question."
+        )
+        answer = call_openai(friendly_prompt, is_conversational=True)
+        return {
+            "query": req.text,
+            "language": lang,
+            "articles_used": [],
+            "answer": answer
+        }
+
+    # Step 2: Legal query – retrieve articles
     try:
         query_embedding = get_embedding(req.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Embedding error: {str(e)}")
 
-    # Retrieve from ChromaDB using the vector
     try:
         results = collection.query(
             query_embeddings=[query_embedding],
-            n_results=7
+            n_results=3,
+            include=["documents", "metadatas", "distances"]  # get distances
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Vector DB error: {str(e)}")
 
     documents = results["documents"][0]
     metadatas = results["metadatas"][0]
+    distances = results["distances"][0]
 
-    if not documents:
-        raise HTTPException(status_code=404, detail="No relevant articles found")
+    # If top result distance is high, consider no relevant articles
+    if not documents or distances[0] > 1.2:   # threshold may need tuning
+        return {
+            "query": req.text,
+            "language": lang,
+            "articles_used": [],
+            "answer": "Je n'ai trouvé aucun article correspondant à votre question. Veuillez reformuler ou consulter un avocat."
+        }
 
-    context_blocks = [f"[Article {meta['number']}]\n{doc}" for doc, meta in zip(documents, metadatas)]
+    # Build context with truncated articles
+    context_blocks = []
+    for doc, meta in zip(documents, metadatas):
+        short_doc = doc[:400] + "..." if len(doc) > 400 else doc
+        context_blocks.append(f"[Article {meta['number']}]\n{short_doc}")
     context = "\n\n".join(context_blocks)
 
     prompt = build_prompt(req.text, context, lang)
-    answer = call_openai(prompt)
+    answer = call_openai(prompt, is_conversational=False)
 
     return {
         "query": req.text,
@@ -160,114 +205,3 @@ async def ask_legal(req: QueryRequest):
         "articles_used": [m["number"] for m in metadatas],
         "answer": answer
     }
-
-
-
-
-# from fastapi import FastAPI, HTTPException
-# from pydantic import BaseModel
-# import chromadb
-# from sentence_transformers import SentenceTransformer
-# from langdetect import detect, LangDetectException
-# import os
-# import requests
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# app = FastAPI()
-
-# # Load vector DB and embedder once (global for Railway container)
-# client = chromadb.PersistentClient(path="./data/chroma_db")
-# collection = client.get_collection("civil_code_quebec")
-# embedder = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-
-
-# class QueryRequest(BaseModel):
-#     text: str
-#     language: str = "auto"  # "auto", "fr", or "en"
-
-
-# def detect_language(text: str) -> str:
-#     """
-#     Detects language from query text.
-#     Falls back to "fr" if detection fails (our data is French,
-#     so French is the safer default).
-#     """
-#     try:
-#         lang = detect(text)
-#         return lang if lang in ("fr", "en") else "fr"
-#     except LangDetectException:
-#         return "fr"
-
-
-# def build_prompt(question: str, context: str, lang: str) -> str:
-#     if lang == "en":
-#         return f"""You are a legal assistant specialized in the Civil Code of Québec.
-# Answer the following question based ONLY on the provided Civil Code articles.
-# Cite article numbers in your answer. The source articles are in French — translate relevant excerpts as needed.
-# Add a disclaimer that this is not legal advice.
-
-# QUESTION: {question}
-
-# RELEVANT CIVIL CODE ARTICLES:
-# {context}
-
-# ANSWER:"""
-#     else:
-#         return f"""Tu es un assistant juridique spécialisé dans le Code civil du Québec.
-# Réponds à la question suivante en te basant UNIQUEMENT sur les articles du Code civil fournis.
-# Cite les numéros d'articles dans ta réponse. Ajoute un avertissement que ce n'est pas un avis juridique.
-
-# QUESTION: {question}
-
-# ARTICLES PERTINENTS DU CODE CIVIL:
-# {context}
-
-# RÉPONSE:"""
-
-
-# @app.post("/ask")
-# async def ask_legal(req: QueryRequest):
-#     # 1. Resolve language
-#     lang = req.language if req.language in ("fr", "en") else detect_language(req.text)
-
-#     # 2. Embed query
-#     query_embedding = embedder.encode(req.text).tolist()
-
-#     # 3. Retrieve relevant articles
-#     results = collection.query(query_embeddings=[query_embedding], n_results=7)
-#     documents = results['documents'][0]
-#     metadatas = results['metadatas'][0]
-
-#     # 4. Build context and prompt
-#     context = "\n\n".join([f"Article {m['number']} : {d}" for d, m in zip(documents, metadatas)])
-#     prompt = build_prompt(req.text, context, lang)
-
-#     # ── OpenAI gpt-4o-mini ────────────────────────────────────────────────────
-#     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-#     response = requests.post(
-#         "https://api.openai.com/v1/chat/completions",
-#         headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
-#         json={
-#             "model": "gpt-4o-mini",
-#             "messages": [{"role": "user", "content": prompt}],
-#             "temperature": 0.3,
-#             "max_tokens": 800
-#         }
-#     )
-#     answer = response.json()["choices"][0]["message"]["content"]
-
-#     # ── DeepSeek (commented out — uncomment to switch back) ───────────────────
-#     # DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-#     # response = requests.post(
-#     #     "https://api.deepseek.com/v1/chat/completions",
-#     #     headers={"Authorization": f"Bearer {DEEPSEEK_API_KEY}"},
-#     #     json={
-#     #         "model": "deepseek-chat",
-#     #         "messages": [{"role": "user", "content": prompt}],
-#     #         "temperature": 0.3,
-#     #         "max_tokens": 800
-#     #     }
-#     # )
-#     # answer = response.json()["choices"][0]["message"]["content"]
