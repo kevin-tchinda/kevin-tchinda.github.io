@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import chromadb
-from chromadb.utils import embedding_functions
 from langdetect import detect, LangDetectException
 import os
 import requests
@@ -11,35 +10,24 @@ load_dotenv()
 
 app = FastAPI()
 
-# ── Config ───────────────────────────────────────────────────────────────────
-
+# Configuration
 DB_PATH = "./data/chroma_db"
 COLLECTION_NAME = "civil_code_quebec"
-MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"
+MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+HF_API_KEY = os.getenv("HF_API_KEY")
+HF_URL = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{MODEL_NAME}"
 
-# ── Initialize once (important for Railway performance) ──────────────────────
-
+# ChromaDB client – no embedding function attached (we'll pass vectors manually)
 client = chromadb.PersistentClient(path=DB_PATH)
+collection = client.get_collection(name=COLLECTION_NAME)
 
-embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name=MODEL_NAME
-)
-
-collection = client.get_collection(
-    name=COLLECTION_NAME,
-    embedding_function=embedding_function
-)
-
-# ── Schemas ──────────────────────────────────────────────────────────────────
-
+# Request schema
 class QueryRequest(BaseModel):
     text: str
-    language: str = "auto"  # "auto", "fr", "en"
+    language: str = "auto"   # "auto", "fr", or "en"
 
-
-# ── Helpers ──────────────────────────────────────────────────────────────────
-
+# Helper: detect language
 def detect_language(text: str) -> str:
     try:
         lang = detect(text)
@@ -47,7 +35,15 @@ def detect_language(text: str) -> str:
     except LangDetectException:
         return "fr"
 
+# Helper: get query embedding from Hugging Face Inference API
+def get_embedding(text: str) -> list:
+    headers = {"Authorization": f"Bearer {HF_API_KEY}"}
+    payload = {"inputs": text, "options": {"wait_for_model": True}}
+    response = requests.post(HF_URL, headers=headers, json=payload, timeout=30)
+    response.raise_for_status()
+    return response.json()   # returns a list of floats
 
+# Helper: build prompt for LLM
 def build_prompt(question: str, context: str, lang: str) -> str:
     if lang == "en":
         return f"""You are a legal assistant specialized in the Civil Code of Québec.
@@ -77,11 +73,10 @@ CONTEXTE:
 
 RÉPONSE:"""
 
-
+# Helper: call OpenAI API
 def call_openai(prompt: str) -> str:
     if not OPENAI_API_KEY:
         raise HTTPException(status_code=500, detail="Missing OPENAI_API_KEY")
-
     try:
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
@@ -94,20 +89,15 @@ def call_openai(prompt: str) -> str:
             },
             timeout=15
         )
-
         response.raise_for_status()
         data = response.json()
-
         return data["choices"][0]["message"]["content"]
-
     except requests.exceptions.Timeout:
         raise HTTPException(status_code=504, detail="LLM request timed out")
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM error: {str(e)}")
 
-
-# ── Endpoint ─────────────────────────────────────────────────────────────────
+# Root endpoint
 @app.get("/")
 async def root():
     return {
@@ -118,15 +108,22 @@ async def root():
         }
     }
 
+# Main ask endpoint
 @app.post("/ask")
 async def ask_legal(req: QueryRequest):
-    # 1. Language resolution
+    # Language resolution
     lang = req.language if req.language in ("fr", "en") else detect_language(req.text)
 
-    # 2. Retrieval (let Chroma handle embeddings internally)
+    # Get query embedding from Hugging Face API
+    try:
+        query_embedding = get_embedding(req.text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Embedding error: {str(e)}")
+
+    # Retrieve relevant articles using the vector
     try:
         results = collection.query(
-            query_texts=[req.text],
+            query_embeddings=[query_embedding],
             n_results=7
         )
     except Exception as e:
@@ -138,19 +135,12 @@ async def ask_legal(req: QueryRequest):
     if not documents:
         raise HTTPException(status_code=404, detail="No relevant articles found")
 
-    # 3. Build structured context (cleaner + more useful to LLM)
-    context_blocks = []
-    for doc, meta in zip(documents, metadatas):
-        context_blocks.append(
-            f"[Article {meta['number']}]\n{doc}"
-        )
-
+    # Build context with article numbers
+    context_blocks = [f"[Article {meta['number']}]\n{doc}" for doc, meta in zip(documents, metadatas)]
     context = "\n\n".join(context_blocks)
 
-    # 4. Prompt
+    # Generate answer with OpenAI
     prompt = build_prompt(req.text, context, lang)
-
-    # 5. LLM call
     answer = call_openai(prompt)
 
     return {

@@ -1,9 +1,6 @@
-requests
-beautifulsoup4
-sentence-transformers
-chromadb
 fastapi
 uvicorn
-openai
+chromadb
 python-dotenv
 langdetect
+requests
