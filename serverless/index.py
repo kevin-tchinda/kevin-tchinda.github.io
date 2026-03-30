@@ -6,6 +6,7 @@ from langdetect import detect, LangDetectException
 import os
 import requests
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -15,6 +16,23 @@ if HF_API_KEY:
     os.environ["HF_TOKEN"] = HF_API_KEY
 
 app = FastAPI()
+
+# ... after creating `app = FastAPI()`
+
+# Allow requests from your frontend origins
+origins = [
+    "https://kevin-tchinda.github.io",
+    "http://localhost:3000",   # for local testing
+    "http://localhost:8000",   # if you test locally
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,          # or ["*"] to allow all (not recommended for production)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Configuration
 DB_PATH = "./data/chroma_db"
