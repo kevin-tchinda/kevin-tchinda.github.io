@@ -6,29 +6,30 @@ ENV TRANSFORMERS_CACHE=/app/model_cache
 
 WORKDIR /app
 
-# Minimal system dependencies
+# Install minimal system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first (for better caching)
+# Copy requirements first (for caching)
 COPY requirements.txt .
 
-# Install CPU-only PyTorch (much smaller)
+# Install CPU‑only PyTorch (smaller)
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 
 # Install remaining Python packages
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy only the runtime‑essential files (exclude large dev files via .dockerignore)
+# Copy the application code
 COPY index.py .
-COPY data/chroma_db ./data/chroma_db    # if you pre‑built the DB, copy it
-# If you want to rebuild the DB at runtime, omit the above line and run embed.py at startup
+COPY embed.py .
+COPY data/ ./data/
 
-# Remove build‑time compilers to shrink the image
+# Build the vector database once during image creation
+RUN python embed.py
+
+# Remove build‑time dependencies to shrink image
 RUN apt-get purge -y gcc && apt-get autoremove -y
 
 EXPOSE 8000
-
-# Start the app (you can also add a startup script to run embed.py if needed)
 CMD ["sh", "-c", "uvicorn index:app --host 0.0.0.0 --port ${PORT:-8000}"]
