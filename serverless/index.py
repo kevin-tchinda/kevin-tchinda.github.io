@@ -1,138 +1,106 @@
+# -*- coding: utf-8 -*-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import chromadb
 from sentence_transformers import SentenceTransformer
-from langdetect import detect, LangDetectException
 import os
 import requests
 from dotenv import load_dotenv
+import json
+import re
+from typing import List, Dict
 
 load_dotenv()
 
 app = FastAPI()
 
 # CORS
-origins = [
+origins =[
     "https://kevin-tchinda.github.io",
     "http://localhost:3000",
     "http://localhost:8000",
     "http://0.0.0.0:3000",
     "http://0.0.0.0:8000",
 ]
+
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware, 
+    allow_origins=origins, 
+    allow_credentials=True, 
+    allow_methods=["*"], 
+    allow_headers=["*"]
 )
 
+# Configuration
 DB_PATH = "./data/chroma_db"
 COLLECTION_NAME = "civil_code_quebec"
 MODEL_NAME = "distiluse-base-multilingual-cased"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# Load embedding model and ChromaDB
 model = SentenceTransformer(MODEL_NAME)
-
 client = chromadb.PersistentClient(path=DB_PATH)
 collection = client.get_collection(name=COLLECTION_NAME)
 
+# In-memory session store
+sessions: Dict[str, dict] = {}
+
+# Request model
 class QueryRequest(BaseModel):
     text: str
-    language: str = "auto"
+    session_id: str
+    conversation: List[dict]
 
-# Simple heuristic to detect conversational/non‑legal queries
-def is_conversational(text: str) -> bool:
-    conversational_patterns = [
-        "bonjour", "salut", "coucou", "hello", "hi", "hey", "comment ça va",
-        "how are you", "ça va", "what's up", "yo", "merci", "thanks", "cool",
-        "super", "génial", "awesome", "ok", "d'accord"
-    ]
-    lower = text.lower().strip()
-    # Short greetings or simple acknowledgements
-    if any(p in lower for p in conversational_patterns) and len(lower) < 40:
-        return True
-    # Also if the query doesn't contain any legal keywords (very simple)
-    legal_keywords = ["article", "code civil", "droit", "loi", "locataire", "propriétaire",
-                      "contrat", "obligation", "responsabilité", "vente", "louer", "bail",
-                      "assurance", "succession", "testament", "divorce", "mariage", "enfant"]
-    if not any(k in lower for k in legal_keywords):
-        # Very short queries that aren't legal
-        if len(lower.split()) <= 3:
-            return True
-    return False
-
-def detect_language(text: str) -> str:
-    try:
-        lang = detect(text)
-        return lang if lang in ("fr", "en") else "fr"
-    except LangDetectException:
-        return "fr"
-
+# Helper to get query embedding
 def get_embedding(text: str) -> list:
     return model.encode(text).tolist()
 
-def build_prompt(question: str, context: str, lang: str) -> str:
-    if lang == "en":
-        return f"""You are a legal assistant specialized in the Civil Code of Québec.
-Answer the question in 1-2 sentences using ONLY the provided articles if relevant.
-Cite article numbers. If no article is relevant, say you don't have information.
-Add a disclaimer that this is not legal advice.
+# Improved system prompt (handles non-legal conversations, language matching)
+def build_system_prompt() -> str:
+    return """You are a legal assistant specialized in the Civil Code of Quebec, created by Kevin Tchinda. You must always respond in the same language as the user's last message.
 
-QUESTION:
-{question}
+Your core task is to help users with legal situations that fall under the Civil Code of Quebec. If the user asks a non-legal question (e.g., casual chat, jokes, personal questions), politely explain that you can only assist with legal matters related to the Civil Code and ask them to describe their legal situation.
 
-RELEVANT ARTICLES:
-{context}
+For legal questions or descriptions of a situation:
+- Do NOT give a direct answer immediately.
+- Ask specific clarifying questions to understand the details (e.g., type of contract, parties involved, timeline, location).
+- Once you have enough information, provide a short summary of what you understood and ask: "Would you like me to consult the Civil Code to find relevant articles for your case?"
+- Only after the user confirms, you will be given relevant articles. Then provide a concise suggestion (2‑3 sentences) and list the article numbers at the end.
 
-ANSWER:"""
-    else:
-        return f"""Tu es un assistant juridique spécialisé dans le Code civil du Québec.
-Réponds en 1-2 phrases en utilisant UNIQUEMENT les articles fournis s'ils sont pertinents.
-Cite les numéros d'articles. Si aucun article n'est pertinent, dis que tu n'as pas l'information.
-Ajoute un avertissement que ce n'est pas un avis juridique.
+If the user insists on non-legal conversation, politely repeat that you are only a legal assistant for the Civil Code of Quebec.
 
-QUESTION:
-{question}
+Keep all responses under 150 words. Be courteous and concise.
+"""
 
-ARTICLES PERTINENTS:
-{context}
-
-RÉPONSE:"""
-
-def call_openai(prompt: str, is_conversational: bool = False) -> str:
+# Helper to call OpenAI API
+def call_openai(messages: List[dict]) -> str:
     if not OPENAI_API_KEY:
-        raise HTTPException(status_code=500, detail="Missing OPENAI_API_KEY")
+        raise HTTPException(500, "Missing OPENAI_API_KEY")
     try:
-        system_message = (
-            "You are a friendly assistant specialized in the Civil Code of Québec. "
-            "Keep answers very short and friendly. If the user greets you, respond warmly."
-            if is_conversational else
-            "You are a legal assistant specialized in the Civil Code of Québec. "
-            "Answer concisely, using only the provided articles if relevant. Cite article numbers. "
-            "Add a disclaimer that this is not legal advice."
-        )
-        response = requests.post(
+        resp = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers={"Authorization": f"Bearer {OPENAI_API_KEY}"},
             json={
                 "model": "gpt-4o-mini",
-                "messages": [
-                    {"role": "system", "content": system_message},
-                    {"role": "user", "content": prompt}
-                ],
+                "messages": messages,
                 "temperature": 0.3,
-                "max_completion_tokens": 200
+                "max_completion_tokens": 400
             },
             timeout=15
         )
-        response.raise_for_status()
-        data = response.json()
-        return data["choices"][0]["message"]["content"]
+        resp.raise_for_status()
+        return resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"LLM error: {str(e)}")
+        raise HTTPException(500, f"OpenAI error: {str(e)}")
 
+# Helper to retrieve articles from ChromaDB
+def retrieve_articles(query: str, n_results: int = 5):
+    query_embedding = get_embedding(query)
+    results = collection.query(query_embeddings=[query_embedding], n_results=n_results)
+    return [(meta["number"], doc) for meta, doc in zip(results["metadatas"][0], results["documents"][0])]
+
+# Root endpoint
 @app.get("/")
 async def root():
     return {
@@ -143,65 +111,95 @@ async def root():
         }
     }
 
+# Endpoint to serve articles.json for frontend
+@app.get("/articles")
+async def get_articles():
+    with open("data/articles.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+# Main endpoint
 @app.post("/ask")
 async def ask_legal(req: QueryRequest):
-    lang = req.language if req.language in ("fr", "en") else detect_language(req.text)
+    # Get or create session state
+    session = sessions.get(req.session_id, {"state": "initial", "pending_query": None})
+    sessions[req.session_id] = session
 
-    # Step 1: If clearly conversational, skip retrieval and use friendly response
-    if is_conversational(req.text):
-        friendly_prompt = (
-            "The user just greeted you or said something conversational. "
-            "Respond warmly in the same language, inviting them to ask a legal question."
-        )
-        answer = call_openai(friendly_prompt, is_conversational=True)
-        return {
-            "query": req.text,
-            "language": lang,
-            "articles_used": [],
-            "answer": answer
-        }
+    # Build conversation with system prompt
+    messages = [{"role": "system", "content": build_system_prompt()}]
+    messages.extend(req.conversation)
 
-    # Step 2: Legal query – retrieve articles
-    try:
-        query_embedding = get_embedding(req.text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Embedding error: {str(e)}")
+    # Get LLM response
+    llm_response = call_openai(messages)
 
-    try:
-        results = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=3,
-            include=["documents", "metadatas", "distances"]  # get distances
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Vector DB error: {str(e)}")
+    # Check if the assistant is asking for confirmation (using keywords)
+    confirm_keywords = [
+        "would you like me to consult", "shall i consult", "do you want me to consult",
+        "souhaitez-vous que je consulte", "voulez-vous que je consulte", "puis-je consulter"
+    ]
+    is_asking_confirmation = any(kw in llm_response.lower() for kw in confirm_keywords)
 
-    documents = results["documents"][0]
-    metadatas = results["metadatas"][0]
-    distances = results["distances"][0]
+    if is_asking_confirmation:
+        # Store the user's original question for later retrieval
+        user_question = next((m["content"] for m in req.conversation if m["role"] == "user"), req.text)
+        session["pending_query"] = user_question
+        session["state"] = "awaiting_confirmation"
+        return {"answer": llm_response, "awaiting_confirmation": True}
 
-    # If top result distance is high, consider no relevant articles
-    if not documents or distances[0] > 1.2:   # threshold may need tuning
-        return {
-            "query": req.text,
-            "language": lang,
-            "articles_used": [],
-            "answer": "Je n'ai trouvé aucun article correspondant à votre question. Veuillez reformuler ou consulter un avocat."
-        }
+    # If waiting for confirmation and user said yes
+    if session.get("state") == "awaiting_confirmation":
+        affirmative = req.text.lower() in ["yes", "y", "oui", "o", "yeah", "sure", "ok", "go ahead", "please"]
+        if affirmative:
+            pending = session.get("pending_query", req.text)
+            articles = retrieve_articles(pending)
+            if not articles:
+                # Fallback (should not happen for legal queries)
+                answer = "I couldn't find relevant articles. Please rephrase your legal situation or consult a lawyer. / Je n'ai pas trouvé d'articles pertinents. Veuillez reformuler votre situation juridique ou consulter un avocat."
+                session["state"] = "initial"
+                session["pending_query"] = None
+                return {"answer": answer, "awaiting_confirmation": False}
+            # Build final answer prompt with structured output
+            context = "\n\n".join([f"[Article {num}]\n{text[:500]}" for num, text in articles])
+            final_prompt = f"""Based on the following articles from the Civil Code of Quebec, write a short suggestion (2-3 sentences) that addresses the user's situation. Then list the article numbers at the end.
 
-    # Build context with truncated articles
-    context_blocks = []
-    for doc, meta in zip(documents, metadatas):
-        short_doc = doc[:400] + "..." if len(doc) > 400 else doc
-        context_blocks.append(f"[Article {meta['number']}]\n{short_doc}")
-    context = "\n\n".join(context_blocks)
+User's situation:
+{pending}
 
-    prompt = build_prompt(req.text, context, lang)
-    answer = call_openai(prompt, is_conversational=False)
+Articles:
+{context}
 
-    return {
-        "query": req.text,
-        "language": lang,
-        "articles_used": [m["number"] for m in metadatas],
-        "answer": answer
-    }
+Format your response exactly as:
+SUGGESTION: (your suggestion here)
+SOURCES: (comma-separated article numbers)
+
+Example:
+SUGGESTION: The landlord is obliged to provide heating as an essential service.
+SOURCES: 1854, 1910
+"""
+            final_response = call_openai([{"role": "user", "content": final_prompt}])
+
+            # Parse the structured response
+            suggestion_match = re.search(r'SUGGESTION:\s*(.*?)(?=\nSOURCES:|\Z)', final_response, re.DOTALL)
+            sources_match = re.search(r'SOURCES:\s*(.*)', final_response)
+            if suggestion_match and sources_match:
+                suggestion = suggestion_match.group(1).strip()
+                sources = sources_match.group(1).strip()
+                article_numbers = [s.strip() for s in sources.split(',')]
+            else:
+                # Fallback: return the whole response as suggestion, no articles
+                suggestion = final_response
+                article_numbers = []
+
+            session["state"] = "initial"
+            session["pending_query"] = None
+            return {
+                "answer": suggestion,
+                "awaiting_confirmation": False,
+                "articles": article_numbers
+            }
+        else:
+            session["state"] = "initial"
+            session["pending_query"] = None
+            return {"answer": llm_response, "awaiting_confirmation": False}
+
+    # Normal response (no confirmation flow)
+    return {"answer": llm_response, "awaiting_confirmation": False}
