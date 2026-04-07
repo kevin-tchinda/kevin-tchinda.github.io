@@ -32,14 +32,14 @@ const playablesData = [
     //     icon: "color-palette-outline",
     //     path: "/playables/ai-art-generator/"
     // },
-    {
-        id: 2,
-        title: "Asteroid Dodger",
-        description: "Avoid asteroids and survive as long as you can",
-        type: "game",
-        icon: "game-controller-outline",
-        path: "/playables/asteroid-dodger/"
-    },
+    // {
+    //     id: 2,
+    //     title: "Asteroid Dodger",
+    //     description: "Avoid asteroids and survive as long as you can",
+    //     type: "game",
+    //     icon: "game-controller-outline",
+    //     path: "/playables/asteroid-dodger/"
+    // },
     {
         id: 3,
         title: "Text Sentiment Analyzer",
@@ -48,14 +48,14 @@ const playablesData = [
         icon: "analytics-outline",
         path: "/playables/sentiment-analyzer/"
     },
-    {
-        id: 4,
-        title: "ML Color Guesser",
-        description: "Train a neural net to guess colors from text",
-        type: "ml",
-        icon: "color-filter-outline",
-        path: "/playables/color-guesser/"
-    },
+    // {
+    //     id: 4,
+    //     title: "ML Color Guesser",
+    //     description: "Train a neural net to guess colors from text",
+    //     type: "ml",
+    //     icon: "color-filter-outline",
+    //     path: "/playables/color-guesser/"
+    // },
     {
         id: 5,
         title: "Music Visualizer",
@@ -79,6 +79,14 @@ const playablesData = [
     //     type: "game",
     //     icon: "game-controller-outline",
     //     path: "/playables/snake-game/"
+    // },
+    // {
+    //     id: 8,
+    //     title: "Echo Runner",
+    //     description: "Endless runner through a magical library. Jump, slide, and collect echoes to score high.",
+    //     type: "game",
+    //     icon: "game-controller-outline",
+    //     path: "/playables/echo-runner/"
     // },
 ];
 

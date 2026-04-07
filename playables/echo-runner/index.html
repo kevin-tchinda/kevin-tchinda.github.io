@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Echo Runner | Kevin Tchinda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../playables/common/playable-styles.css">
+    <style>
+        body {
+            overflow: hidden;
+        }
+        #game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 1rem auto;
+            max-width: 100%;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background-color: var(--bg-surface);
+        }
+        .game-info {
+            text-align: center;
+            margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .controls-hint {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+        }
+        @media (max-width: 768px) {
+            .controls-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="playable-header">
+        <div class="container">
+            <div class="logo">
+                <span class="prompt">>_</span> kevin.tchinda
+            </div>
+            <a href="/" class="back-button">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="command-header">
+            <span class="command-text">>_ echo-runner --play</span>
+        </div>
+        <div id="game-container"></div>
+        <div class="game-info">
+            <div id="scoreDisplay">Score: 0</div>
+            <div class="controls-hint">
+                <span>Swipe up / ↑ = Jump</span>
+                <span>Swipe down / ↓ = Slide</span>
+                <span>Tap book = Collect</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.87.0/dist/phaser.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Cosmic Explorer | Kevin Tchinda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../playables/common/playable-styles.css">
+    <style>
+        #game-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, rgba(10, 25, 50, 0.8) 0%, rgba(20, 40, 70, 0.9) 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16 / 9;
+            min-height: 500px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .game-info {
+            text-align: center;
+            margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .controls-hint {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+
+        .control-key {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            font-weight: 600;
+            min-width: 35px;
+            text-align: center;
+        }
+
+        .chapter-info {
+            text-align: center;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(100, 200, 255, 0.1);
+            border-left: 3px solid rgba(100, 200, 255, 0.5);
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            #game-container {
+                min-height: 350px;
+                aspect-ratio: auto;
+            }
+
+            .game-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+
+            .controls-hint {
+                grid-template-columns: 1fr;
+                gap: 0.25rem;
+                padding: 0.5rem;
+            }
+
+            .control-item {
+                justify-content: flex-start;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="playable-header">
+        <div class="container">
+            <div class="logo">
+                <span class="prompt">>_</span> kevin.tchinda
+            </div>
+            <a href="/" class="back-button">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="command-header">
+            <span class="command-text">>_ cosmic-explorer --play</span>
+        </div>
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+            Embark on a cosmic journey through asteroid fields and nebulas. Discover ancient artifacts, solve celestial puzzles, and uncover the mysteries of the universe. A casual adventure designed for deep exploration.
+        </p>
+    </div>
+
+    <div id="game-container"></div>
+
+    <div class="container game-info">
+        <div class="game-stats">
+            <div class="stat">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="scoreDisplay">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Artifacts Found</div>
+                <div class="stat-value" id="artifactsDisplay">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Distance</div>
+                <div class="stat-value" id="distanceDisplay">0 LY</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Health</div>
+                <div class="stat-value" id="healthDisplay">100%</div>
+            </div>
+        </div>
+
+        <div class="chapter-info" id="chapterDisplay">
+            Chapter 1: The Awakening
+        </div>
+
+        <div class="controls-hint">
+            <div class="control-item">
+                <span class="control-key">W/↑</span>
+                <span>Forward</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">A/←</span>
+                <span>Left</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">S/↓</span>
+                <span>Backward</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">D/→</span>
+                <span>Right</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">SPACE</span>
+                <span>Ascend</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">CTRL</span>
+                <span>Descend</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">SWIPE</span>
+                <span>Mobile Control</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">TAP</span>
+                <span>Interact/Scan</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.87.0/dist/phaser.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
