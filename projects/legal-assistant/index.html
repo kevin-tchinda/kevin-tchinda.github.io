@@ -14,22 +14,16 @@
             overflow: hidden;
             height: 100%;
         }
-        /* Main container uses full viewport height */
         .app-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
-        /* Header and command area are fixed height */
-        .playable-header {
-            flex-shrink: 0;
-        }
         .command-section {
             flex-shrink: 0;
             margin: 0 1.5rem;
         }
-        /* Chat container takes remaining space and is scrollable */
         .chat-container {
             flex: 1;
             display: flex;
@@ -50,7 +44,6 @@
             gap: 0.75rem;
             scroll-behavior: smooth;
         }
-        /* Welcome message */
         .welcome-message {
             text-align: center;
             margin: auto;
@@ -60,7 +53,6 @@
             font-weight: 500;
             font-family: 'Inter', sans-serif;
         }
-        /* Message bubbles with avatars */
         .message {
             display: flex;
             align-items: flex-start;
@@ -115,7 +107,24 @@
         .message.user .message-timestamp {
             text-align: left;
         }
-        /* Typing indicator */
+        .date-separator {
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .date-separator::before,
+        .date-separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: var(--border);
+            margin: 0 1rem;
+        }
         .typing-indicator {
             display: flex;
             align-items: center;
@@ -143,7 +152,6 @@
             0%, 60%, 100% { transform: scale(1); opacity: 0.5; }
             30% { transform: scale(1.2); opacity: 1; }
         }
-        /* Input area */
         .input-area {
             flex-shrink: 0;
             display: flex;
@@ -156,7 +164,24 @@
         .input-row {
             display: flex;
             gap: 0.5rem;
-            align-items: flex-end;
+            align-items: center;
+        }
+        .clear-chat-btn {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .clear-chat-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
         }
         .input-row textarea {
             flex: 1;
@@ -175,7 +200,7 @@
             outline: none;
             border-color: var(--accent-primary);
         }
-        .input-row button {
+        .input-row button.send-btn {
             background-color: var(--accent-primary);
             border: none;
             border-radius: 40px;
@@ -187,12 +212,13 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
-        .input-row button:disabled {
+        .input-row button.send-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        .input-row button:hover:not(:disabled) {
+        .input-row button.send-btn:hover:not(:disabled) {
             background-color: #A54A2C;
         }
         .char-counter {
@@ -204,7 +230,68 @@
         .char-counter.warning {
             color: var(--accent-primary);
         }
-        /* Disclaimer */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-width: 90%;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .modal-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .modal-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+        .modal-btn.confirm {
+            background-color: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+        .modal-btn.cancel {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .modal-btn.confirm:hover {
+            background-color: #A54A2C;
+        }
+        .modal-btn.cancel:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
         .disclaimer {
             flex-shrink: 0;
             background-color: var(--bg-primary);
@@ -228,10 +315,10 @@
             .message {
                 max-width: 90%;
             }
-            .input-row button span {
+            .input-row button.send-btn span {
                 display: none;
             }
-            .input-row button {
+            .input-row button.send-btn {
                 padding: 0.75rem;
             }
         }
@@ -239,17 +326,16 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Header exactly as in Ottawa project -->
         <div class="playable-header">
             <div class="container">
-                <div class="header-inner">
-                    <div class="logo">
-                        <span class="prompt">>_</span> kevin.tchinda
-                    </div>
-                    <a href="/" class="back-button">
-                        <ion-icon name="arrow-back-outline"></ion-icon>
-                        Back
-                    </a>
+                <div class="logo">
+                    <span class="prompt">>_</span> kevin.tchinda
                 </div>
+                <a href="/" class="back-button">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Back
+                </a>
             </div>
         </div>
 
@@ -270,8 +356,11 @@
             </div>
             <div class="input-area">
                 <div class="input-row">
+                    <button id="clearChatBtn" class="clear-chat-btn" aria-label="Clear chat">
+                        <ion-icon name="trash-outline"></ion-icon>
+                    </button>
                     <textarea id="userInput" rows="1" placeholder="Type your message..." maxlength="500"></textarea>
-                    <button id="sendBtn">
+                    <button id="sendBtn" class="send-btn">
                         <ion-icon name="send-outline"></ion-icon>
                         <span>Send</span>
                     </button>
