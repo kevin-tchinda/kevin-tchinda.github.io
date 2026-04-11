@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>QR Code Generator | Kevin Tchinda</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../playables/common/playable-styles.css">
+    <!-- QRCodeStyling library -->
+    <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    <style>
+        /* Page-specific styles */
+        .generator-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .qr-preview {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        #qr-code-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            padding: 0;
+        }
+
+        .caption-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-secondary);
+            text-transform: uppercase;
+        }
+
+        input,
+        select {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .color-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .color-input input[type="color"] {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .file-upload {
+            background-color: var(--bg-primary);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .download-btn {
+            background-color: var(--accent-primary);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--bg-primary);
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            margin-top: 1rem;
+        }
+
+        .download-btn:hover {
+            background-color: #A54A2C;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .generator-container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="playable-header">
+        <div class="container">
+            <div class="logo">
+                <span class="prompt">>_</span> kevin.tchinda
+            </div>
+            <a href="/" class="back-button">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <div class="generator-container">
+        <div class="command-header">
+            <span class="command-text">>_ qr-generator --create</span>
+        </div>
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);">
+            Customize your QR code with colors, logo, and style.
+        </p>
+
+        <div class="qr-preview">
+            <div id="qr-code-container"></div>
+            <div id="caption-display" class="caption-text"></div>
+        </div>
+
+        <div class="controls-grid">
+            <div class="control-group">
+                <label>Text / URL</label>
+                <input type="text" id="qr-text" value="https://kevin-tchinda.github.io" placeholder="https:// or text">
+            </div>
+            <div class="control-group">
+                <label>Foreground (dots)</label>
+                <div class="color-input">
+                    <input type="color" id="dots-color" value="#000000">
+                    <input type="text" id="dots-color-hex" value="#000000" style="flex:1">
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Background</label>
+                <div class="color-input">
+                    <input type="color" id="bg-color" value="#ffffff">
+                    <input type="text" id="bg-color-hex" value="#ffffff" style="flex:1">
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Dot style</label>
+                <select id="dot-style">
+                    <option value="square">Square</option>
+                    <option value="rounded">Rounded</option>
+                    <option value="dots">Dots</option>
+                    <option value="classy">Classy</option>
+                    <option value="classy-rounded">Classy rounded</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Corner style</label>
+                <select id="corner-style">
+                    <option value="square">Square</option>
+                    <option value="rounded">Rounded</option>
+                    <option value="extra-rounded">Extra rounded</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Logo (optional)</label>
+                <div class="file-upload" id="logo-upload-area">
+                    <ion-icon name="cloud-upload-outline"></ion-icon> Click to upload
+                    <input type="file" id="logo-file" accept="image/*" style="display:none">
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Caption (text below)</label>
+                <input type="text" id="caption-text" placeholder="e.g., Scan me!">
+            </div>
+            <div class="control-group">
+                <label>Border</label>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 0.25rem;">
+                        <input type="checkbox" id="border-enabled" checked> Enable
+                    </label>
+                    <div class="color-input" style="flex:1;">
+                        <input type="color" id="border-color" value="#000000">
+                        <input type="text" id="border-color-hex" value="#000000" style="width:70px">
+                    </div>
+                    <input type="number" id="border-width" value="5" min="0" max="20" style="width:70px"
+                        placeholder="px">
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Border radius (px)</label>
+                <input type="number" id="border-radius" value="10" min="0" max="50">
+            </div>
+            <div class="control-group">
+                <label>Padding (px) – space between QR and border</label>
+                <input type="number" id="border-padding" value="10" min="0" max="30">
+            </div>
+        </div>
+
+        <button id="download-btn" class="download-btn">
+            <ion-icon name="download-outline"></ion-icon> Download PNG
+        </button>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

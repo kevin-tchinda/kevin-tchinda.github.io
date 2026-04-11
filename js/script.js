@@ -88,6 +88,14 @@ const playablesData = [
     //     icon: "game-controller-outline",
     //     path: "/playables/echo-runner/"
     // },
+    {
+        id: 9,
+        title: "QR Code Generator",
+        description: "Generate customizable QR codes with colors, logo, and styles.",
+        type: "tool",
+        icon: "qr-code-outline",
+        path: "/playables/qr-code-generator/"
+    },
 ];
 
 // ============================================
