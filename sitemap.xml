@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://kevin-tchinda.github.io/</loc>
+        <lastmod>2025-04-10</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://kevin-tchinda.github.io/projects/legal-assistant/</loc>
+        <lastmod>2025-04-10</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://kevin-tchinda.github.io/projects/ottawa-collision-zones/</loc>
+        <lastmod>2025-04-10</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://kevin-tchinda.github.io/playables/music-visualizer/</loc>
+        <lastmod>2025-04-10</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://kevin-tchinda.github.io/playables/qr-code-generator/</loc>
+        <lastmod>2025-04-10</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <url>
+        <loc>https://kevin-tchinda.github.io/playables/sentiment-analyzer/</loc>
+        <lastmod>2025-04-10</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    <!-- add more URLs as you create pages -->
+</urlset>
