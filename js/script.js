@@ -96,6 +96,14 @@ const playablesData = [
         icon: "qr-code-outline",
         path: "/playables/qr-code-generator/"
     },
+    {
+        id: 10,
+        title: "Document Scanner",
+        description: "Real-time document detection and perspective correction using your camera.",
+        type: "tool",
+        icon: "scan-outline",
+        path: "/playables/document-scanner/"
+    },
 ];
 
 // ============================================
