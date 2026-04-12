@@ -1,0 +1,3 @@
+[submodule "my-tts-api"]
+	path = my-tts-api
+	url = https://huggingface.co/spaces/kevin-tchinda/my-tts-api
