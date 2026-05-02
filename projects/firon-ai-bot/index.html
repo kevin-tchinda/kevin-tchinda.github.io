@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firon AI | Interactive Pitch Dashboard</title>
+    <link rel="stylesheet" href="https://firon-bot-widget.up.railway.app/widget/widget.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --firon-deep-blue: #1e3a8a;
+            --firon-vibrant-red: #e31837;
+            --firon-white: #ffffff;
+            --firon-bg: #eceff4;
+            --firon-sidebar: #1e3a8a;
+            --firon-active-card: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--firon-bg);
+            overflow: hidden; /* Lock the body to prevent double scrollbars */
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%; /* Use full viewport height */
+        }
+
+        /* Sidebar Navigation (Fixed at top on mobile, fixed at left on desktop) */
+        .sidebar {
+            width: 100%;
+            background: var(--firon-sidebar);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 100;
+            flex-shrink: 0; /* Prevents the header from shrinking */
+        }
+
+        .sidebar-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .sidebar-header img { width: 140px; filter: brightness(0) invert(1); }
+
+        .nav-steps-container {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            gap: 10px;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .nav-steps-container::-webkit-scrollbar { display: none; }
+
+        .nav-step {
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.6;
+            white-space: nowrap;
+            background: rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+        .nav-step:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+        .nav-step.active {
+            opacity: 1;
+            background: var(--firon-vibrant-red);
+            box-shadow: 0 4px 15px rgba(227, 24, 55, 0.3);
+        }
+        .nav-step .step-num {
+            width: 24px; height: 24px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 10px;
+        }
+        .nav-step .step-label { font-weight: 600; font-size: 13px; }
+
+        /* Main Content Area - This is now the ONLY scrollable container */
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .content-card {
+            background: white;
+            width: 100%;
+            max-width: 850px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+            margin-bottom: 40px; /* Space at bottom of scroll */
+        }
+        .content-card.active { display: block; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-card h2 {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--firon-deep-blue);
+            margin-top: 0;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        .content-card p {
+            font-size: 16px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .gain-row {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .gain-label { font-weight: 700; color: var(--firon-deep-blue); font-size: 14px; }
+        .gain-value { color: var(--firon-vibrant-red); font-weight: 600; margin-top: 4px; }
+
+        .roi-box {
+            background: #fef2f2;
+            border: 2px dashed var(--firon-vibrant-red);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 24px;
+        }
+
+        .future-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 24px;
+        }
+        .future-item {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 12px;
+            display: flex; gap: 12px; align-items: center;
+        }
+
+        .footer-note {
+            display: none; /* Hide on mobile */
+        }
+
+        .demo-badge {
+            margin-top: auto;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+        }
+        .demo-badge:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        .demo-badge ion-icon {
+            font-size: 24px;
+            color: var(--firon-vibrant-red);
+        }
+        .demo-badge span {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        /* Desktop Layout Overrides */
+        @media (min-width: 1024px) {
+            body, html { overflow: hidden; }
+            .app-container { flex-direction: row; height: 100vh; }
+            
+            .sidebar {
+                width: 350px;
+                height: 100vh;
+                padding: 40px 24px;
+                box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+                position: relative;
+                top: auto;
+            }
+            .sidebar-header { margin-bottom: 50px; }
+            .sidebar-header img { width: 180px; }
+            
+            .nav-steps-container {
+                flex-direction: column;
+                overflow: visible;
+                gap: 12px;
+            }
+            .nav-step {
+                padding: 16px 20px;
+                border-radius: 12px;
+                white-space: normal;
+                background: transparent;
+            }
+            .nav-step .step-num { width: 28px; height: 28px; font-size: 12px; }
+            .nav-step .step-label { font-size: 15px; }
+
+            .main-content {
+                padding: 60px;
+                align-items: center;
+                overflow-y: auto;
+                height: 100vh;
+            }
+            .content-card { padding: 50px; border-radius: 24px; }
+            .content-card h2 { font-size: 36px; margin-bottom: 30px; }
+            .content-card p { font-size: 18px; }
+
+            .gain-row { flex-direction: row; justify-content: space-between; align-items: center; }
+            .gain-value { margin-top: 0; text-align: right; }
+
+            .future-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+            .footer-note {
+                display: block;
+                position: absolute;
+                bottom: 30px;
+                right: 120px;
+                font-weight: 600;
+                color: #94a3b8;
+                font-size: 13px;
+                background: white;
+                padding: 10px 20px;
+                border-radius: 50px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="https://fironroofing.ca" target="_blank" style="text-decoration: none;">
+                    <img src="https://firon-bot-widget.up.railway.app/widget/firon-logo.webp" alt="Firon Roofing">
+                </a>
+                <div style="margin-top: 10px; font-weight: 700; letter-spacing: 2px; font-size: 12px; opacity: 0.8;">AI STRATEGY DECK</div>
+            </div>
+
+            <div class="nav-steps-container">
+                <div class="nav-step active" data-target="problem">
+                    <div class="step-num">01</div>
+                    <div class="step-label">The Conflict</div>
+                </div>
+                <div class="nav-step" data-target="stakes">
+                    <div class="step-num">02</div>
+                    <div class="step-label">The Stakes</div>
+                </div>
+                <div class="nav-step" data-target="solution">
+                    <div class="step-num">03</div>
+                    <div class="step-label">Engineered Solution</div>
+                </div>
+                <div class="nav-step" data-target="impact">
+                    <div class="step-num">04</div>
+                    <div class="step-label">Measurable Gains</div>
+                </div>
+                <div class="nav-step" data-target="roi">
+                    <div class="step-num">05</div>
+                    <div class="step-label">ROI Analysis</div>
+                </div>
+                <div class="nav-step" data-target="roadmap">
+                    <div class="step-num">06</div>
+                    <div class="step-label">Future Roadmap</div>
+                </div>
+            </div>
+
+            <div class="demo-badge" id="demo-badge">
+                <ion-icon name="sparkles"></ion-icon>
+                <span>Test the Live Firon AI<br><small style="opacity:0.7; font-weight:400;">Bottom right corner</small></span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Problem -->
+            <div class="content-card active" id="card-problem">
+                <div style="color:var(--firon-vibrant-red); font-weight:800; margin-bottom: 10px; text-transform: uppercase; font-size: 12px;">Market Reality</div>
+                <h2>The Manual Response Bottleneck</h2>
+                <p>Every Podium chat starts a clock. Right now, your team has to <strong>manually</strong> race that clock for every single visitor. Paying staff to answer routine questions about "Warranty" or "Service Areas" isn't a task, it's a resource drain.</p>
+                <div style="margin-top: 30px; background: #fff; border: 1px solid #eee; padding: 20px; border-radius: 12px; display: flex; gap: 20px; align-items: center;">
+                    <div style="font-size: 32px; color: var(--firon-vibrant-red);"><ion-icon name="bar-chart-outline"></ion-icon></div>
+                    <div style="font-size: 15px; color: #64748b;"><strong>Current State:</strong> 100% human labor for basic repetitive queries. No intelligent lead filtering.</div>
+                </div>
+            </div>
+
+            <!-- The Stakes -->
+            <div class="content-card" id="card-stakes">
+                <div style="color:var(--firon-vibrant-red); font-weight:800; margin-bottom: 10px; text-transform: uppercase; font-size: 12px;">The Technical Gap</div>
+                <h2>High-Stakes Friction</h2>
+                <p>A roof isn't a simple purchase, it’s a $20,000 technical investment often triggered by an emergency. The real problem isn't just "after-hours response", it’s that <strong>high-intent homeowners in distress</strong> are paralyzed by the complexity of warranty tiers and building codes.</p>
+                <p style="margin-top: 15px;">Firon AI specifically solves this <strong>Expertise Bottleneck</strong> by acting as a 24/7 technical consultant. It doesn't just "chat", it qualifies structural complexity and manufacturer standards before your team even picks up the phone.</p>
+                <div class="roi-box" style="margin-top: 25px;">
+                    <div style="font-weight: 700; color: var(--firon-vibrant-red); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">The 5-Minute Rule</div>
+                    <div style="font-size: 14px; margin-top: 5px; color: #64748b;">Industry data confirms that waiting just 10 minutes to respond reduces lead qualification chances by <strong>400%</strong>.</div>
+                </div>
+            </div>
+
+            <!-- Solution -->
+            <div class="content-card" id="card-solution">
+                <div style="color:var(--firon-vibrant-red); font-weight:800; margin-bottom: 10px; text-transform: uppercase; font-size: 12px;">The Core Solution</div>
+                <h2>24/7 Intelligence Engine</h2>
+                <p>This is not a simple chatbot. It’s an interactive knowledge base trained on Firon's specific data. It answers instantly, clarifies the intent, and qualifies the lead.</p>
+                <ul style="color: #64748b; font-size: 16px; margin-top: 20px;">
+                    <li style="margin-bottom: 10px;"><strong>Always On:</strong> Captures quotes at 10 PM on a Sunday.</li>
+                    <li style="margin-bottom: 10px;"><strong>Zero Response Lag:</strong> Millisecond response time, keeping users engaged.</li>
+                    <li><strong>Proactive:</strong> Detects hesitancy and prompts interaction.</li>
+                </ul>
+                <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-radius: 12px; border-left: 4px solid var(--firon-vibrant-red); cursor: pointer;" onclick="document.querySelector('.firon-chat-toggle').click()">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <ion-icon name="play-circle-outline" style="font-size: 32px; color: var(--firon-vibrant-red);"></ion-icon>
+                        <div>
+                            <div style="font-weight: 800; color: var(--firon-deep-blue); font-size: 15px;">Experience it Now</div>
+                            <div style="font-size: 13px; color: #64748b; margin-top: 2px;">Click here to launch the live demo in the bottom right corner.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Impact -->
+            <div class="content-card" id="card-impact">
+                <div style="color:var(--firon-vibrant-red); font-weight:800; margin-bottom: 10px; text-transform: uppercase; font-size: 12px;">What You Gain</div>
+                <h2>Performance Metrics</h2>
+                <div class="gain-row">
+                    <div class="gain-label">Staff Time Reclaimed</div>
+                    <div class="gain-value">10–15 Hours / Week</div>
+                </div>
+                <div class="gain-row">
+                    <div class="gain-label">Lead Qualification</div>
+                    <div class="gain-value">Automated High-Intent Filtering</div>
+                </div>
+                <div class="gain-row">
+                    <div class="gain-label">After-Hours Engagement</div>
+                    <div class="gain-value">365 Days / Year Coverage</div>
+                </div>
+                <div class="gain-row">
+                    <div class="gain-label">Operational Overhead</div>
+                    <div class="gain-value">Reduced by 80% per Chat</div>
+                </div>
+            </div>
+
+            <!-- ROI -->
+            <div class="content-card" id="card-roi">
+                <div style="color:var(--firon-vibrant-red); font-weight:800; margin-bottom: 10px; text-transform: uppercase; font-size: 12px;">Financial Realities</div>
+                <h2>Annual Savings: $12,480</h2>
+                <p>By automating 80% of manual replies, the AI eliminates the overhead of basic chat management, letting your staff focus on sales and closing deals.</p>
+                <div class="roi-box">
+                    <div style="font-weight: 700; color: var(--firon-vibrant-red);">ROI ACCELERATOR</div>
+                    <div style="font-size: 14px; margin-top: 5px; color: #64748b;">The one-time setup pays for itself in just weeks by replacing recurring manual labor costs.</div>
+                </div>
+            </div>
+
+            <!-- Roadmap -->
+            <div class="content-card" id="card-roadmap">
+                <div style="color:var(--firon-vibrant-red); font-weight:800; margin-bottom: 10px; text-transform: uppercase; font-size: 12px;">Phase 2 & Beyond</div>
+                <h2>AI Ecosystem Roadmap</h2>
+                <div class="future-grid">
+                    <div class="future-item">
+                        <div style="width: 56px; height: 56px; min-width: 56px; background: rgba(227, 24, 55, 0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><ion-icon name="partly-sunny-outline" style="font-size: 36px; color: var(--firon-vibrant-red);"></ion-icon></div>
+                        <div><strong>Weather Logic</strong><br><small>Monitors local micro-climates to automatically redirect inspection teams to job sites with the best possible working conditions.</small></div>
+                    </div>
+                    <div class="future-item">
+                        <div style="width: 56px; height: 56px; min-width: 56px; background: rgba(227, 24, 55, 0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><ion-icon name="eye-outline" style="font-size: 36px; color: var(--firon-vibrant-red);"></ion-icon></div>
+                        <div><strong>Visual Damage Triage</strong><br><small>Uses AI vision to instantly differentiate between storm damage, installation errors, and normal aging.</small></div>
+                    </div>
+                    <div class="future-item">
+                        <div style="width: 56px; height: 56px; min-width: 56px; background: rgba(227, 24, 55, 0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><ion-icon name="shield-checkmark-outline" style="font-size: 36px; color: var(--firon-vibrant-red);"></ion-icon></div>
+                        <div><strong>Project Paper Trail</strong><br><small>Eliminates disputes by automating digital approvals for post-sale change orders and warranty claims.</small></div>
+                    </div>
+                    <div class="future-item">
+                        <div style="width: 56px; height: 56px; min-width: 56px; background: rgba(227, 24, 55, 0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;"><ion-icon name="cube-outline" style="font-size: 36px; color: var(--firon-vibrant-red);"></ion-icon></div>
+                        <div><strong>Predictive Inventory</strong><br><small>Syncs with suppliers to prevent mid-job material shortages during Ottawa's peak building season.</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-note">Interact with the Chat AI in the bottom right corner at any time.</div>
+        </div>
+    </div>
+
+    <script>
+        const steps = document.querySelectorAll('.nav-step');
+        const cards = document.querySelectorAll('.content-card');
+
+        steps.forEach(step => {
+            step.addEventListener('click', () => {
+                // Update active step
+                steps.forEach(s => s.classList.remove('active'));
+                step.classList.add('active');
+
+                // Update active card
+                const target = step.getAttribute('data-target');
+                cards.forEach(c => {
+                    c.classList.remove('active');
+                    if (c.id === `card-${target}`) {
+                        c.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Demo badge click opens the widget
+        document.getElementById('demo-badge').addEventListener('click', () => {
+            const toggle = document.querySelector('.firon-chat-toggle');
+            if (toggle) toggle.click();
+        });
+    </script>
+    <script>
+        window.FironChatConfig = {
+            apiUrl: "https://firon-bot-api.up.railway.app"
+        };
+    </script>
+    <script src="https://firon-bot-widget.up.railway.app/widget/widget.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
